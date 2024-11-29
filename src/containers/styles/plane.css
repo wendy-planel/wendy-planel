@@ -1,0 +1,184 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+}
+
+.plane-box {
+    width: 90vw;
+    height: 90vh;
+    margin-left: 3vh;
+    margin-right: 1.1vh;
+    overflow: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    /* 针对Internet Explorer和Edge */
+    scrollbar-width: none;
+    /* 针对Firefox */
+}
+
+.plane-card {
+    width: 99%;
+    height: 44.58vh;
+    background-color: var(--bg-color);
+    border-radius: 1vh;
+    margin-bottom: 1vh;
+    display: flex;
+    justify-items: left;
+}
+
+.plane-box::-webkit-scrollbar {
+    display: none;
+}
+
+.plane-card-room {
+    width: 20rem;
+    height: 70%;
+    margin: 1rem 1rem 1rem 1rem;
+}
+
+.plane-card-line {
+    font-size: 0.8rem;
+    margin-top: 0;
+    height: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.plane-card-line input {
+    width: 100%;
+    max-width: 15rem;
+    background: none;
+    outline: none;
+    border: 0.125rem solid transparent;
+    white-space: nowrap;
+    color: white;
+    transition: border-color 0.3s ease;
+}
+
+.plane-card-line input:hover {
+    border-color: #3498db;
+    /* 鼠标悬停或选中时显示的边框颜色 */
+    border-width: 0.125rem;
+}
+
+.plane-card-line input:focus {
+    border-color: #3498db;
+    /* 鼠标悬停或选中时显示的边框颜色 */
+    border-width: 0.125rem;
+}
+
+.radio-box {
+    display: flex;
+    align-items: center;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    margin-right: 0.8rem;
+    cursor: pointer;
+    /* 增加鼠标悬停时的手型指针 */
+}
+
+.radio-item input {
+    width: 0.9rem;
+    /* 增大radio按钮的尺寸 */
+    height: 0.9rem;
+    /* 增大radio按钮的尺寸 */
+}
+
+.radio-item input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #0000;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 0.125rem solid #504f4f;
+    position: relative;
+}
+
+.radio-item input[type="radio"]::before {
+    content: '';
+    border-radius: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: #3498db;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.radio-item input[type="radio"]:checked::before {
+    opacity: 1;
+}
+
+.copy-box {
+    width: 20rem;
+    display: flex;
+    align-items: center;
+}
+
+.stats-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 18%;
+    width: 20rem;
+    font-size: 0.8rem;
+}
+
+.stats-box-item {
+    display: flex;
+    color: #3498db;
+    align-items: center;
+    justify-content: left;
+    height: 100%;
+}
+
+.stats-box-item:hover {
+    cursor: pointer;
+}
+
+.stats-box-text {
+    margin-left: 1%;
+}
+
+.stats-box-date {
+    font-size: 0.6rem;
+}
+
+.buttons-box {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    height: 20%;
+    width: 20rem;
+    gap: 6rem;
+}
+
+.buttons-box-item {
+    cursor: pointer;
+}
+
+.buttons-box-share {
+    position: relative;
+    display: inline-block;
+}
+
+
+.buttons-box-item-tip {
+    position: absolute;
+    left: 75%;
+    transform: translateX(-50%);
+    background-color: #504f4f;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    white-space: nowrap;
+    width: fit-content;
+  }
+  
+  .buttons-box-item-tip.hide {
+    opacity: 0;
+  }
