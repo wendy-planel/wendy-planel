@@ -167,7 +167,6 @@ input::-webkit-inner-spin-button {
     display: inline-block;
 }
 
-
 .buttons-box-item-tip {
     position: absolute;
     left: 75%;
@@ -177,8 +176,8 @@ input::-webkit-inner-spin-button {
     transition: opacity 0.5s ease-in-out;
     white-space: nowrap;
     width: fit-content;
-  }
-  
-  .buttons-box-item-tip.hide {
+}
+
+.buttons-box-item-tip.hide {
     opacity: 0;
-  }
+}
