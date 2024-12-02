@@ -1,4 +1,4 @@
-interface DeployClusterIni {
+export interface DeployClusterIni {
     game_mode: "survival" | "endless" | "wilderness"
     max_players: number
     pvp: boolean
