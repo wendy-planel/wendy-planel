@@ -1,9 +1,9 @@
-.tooltip-container {
+.hovertip-container {
     display: inline-block;
     position: relative;
 }
 
-.tooltip {
+.hovertip {
     position: absolute;
     bottom: -3rem;
     left: 50%;
@@ -19,7 +19,7 @@
     transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
 }
 
-.tooltip::after {
+.hovertip::after {
     content: '';
     position: absolute;
     bottom: 100%;
@@ -30,7 +30,7 @@
     border-color: transparent transparent #485565 transparent;
 }
 
-.tooltip-container:hover .tooltip {
+.hovertip-container:hover .hovertip {
     opacity: 0.75; /* 鼠标悬停时显示 */
     visibility: visible; /* 鼠标悬停时显示 */
 }
