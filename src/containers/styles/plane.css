@@ -6,28 +6,26 @@ input::-webkit-inner-spin-button {
 .plane-box {
     width: 90vw;
     height: 90vh;
-    margin-left: 3vh;
-    margin-right: 1.1vh;
-    overflow: hidden;
+    margin-left: 1vw;
+    margin-right: 1vw;
+    margin-top: 2vh;
     overflow-y: scroll;
     -ms-overflow-style: none;
-    /* 针对Internet Explorer和Edge */
-    scrollbar-width: none;
-    /* 针对Firefox */
+    scroll-snap-type: y mandatory;
+}
+
+.plane-box::-webkit-scrollbar {
+    display: none;
 }
 
 .plane-card {
-    width: 99%;
-    height: 44.58vh;
+    height: 44vh;
     background-color: var(--bg-color);
     border-radius: 1vh;
     margin-bottom: 1vh;
     display: flex;
     justify-items: left;
-}
-
-.plane-box::-webkit-scrollbar {
-    display: none;
+    scroll-snap-align: start;
 }
 
 .plane-card-room {
@@ -56,13 +54,11 @@ input::-webkit-inner-spin-button {
 
 .plane-card-line input:hover {
     border-color: #3498db;
-    /* 鼠标悬停或选中时显示的边框颜色 */
     border-width: 0.125rem;
 }
 
 .plane-card-line input:focus {
     border-color: #3498db;
-    /* 鼠标悬停或选中时显示的边框颜色 */
     border-width: 0.125rem;
 }
 
@@ -76,14 +72,11 @@ input::-webkit-inner-spin-button {
     align-items: center;
     margin-right: 0.8rem;
     cursor: pointer;
-    /* 增加鼠标悬停时的手型指针 */
 }
 
 .radio-item input {
     width: 0.9rem;
-    /* 增大radio按钮的尺寸 */
     height: 0.9rem;
-    /* 增大radio按钮的尺寸 */
 }
 
 .radio-item input[type="radio"] {

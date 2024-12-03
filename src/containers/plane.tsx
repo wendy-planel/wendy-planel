@@ -1,10 +1,13 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 
 import './styles/plane.css'
-import { readDeploy } from '../api'
 import { Tooltip } from "../components/tooltip"
 import { Deploy, DeployClusterIni } from '../common/interface'
 import { isPublicIP, extractFirstValidIP } from '../common/tools'
+import {
+  readDeploy,
+  deleteDeploy,
+} from '../api'
 import {
   CpuIcon,
   LoadIcon,
@@ -53,12 +56,22 @@ export function Plane() {
     })
     setDeploy(data)
   }
+  // 删除部署
+  async function handleDelete(id: number) {
+    await deleteDeploy(id)
+    await loadData()
+  }
   useEffect(() => { loadData() }, [])
   return (
     <div className='plane-box'>
       {
         deploy?.map(function (item) {
-          return <PlaneDeploy key={item.id} deploy={item} ></PlaneDeploy>
+          return <PlaneDeploy
+            key={item.id}
+            deploy={item}
+            onDelete={handleDelete}
+          >
+          </PlaneDeploy>
         })
       }
     </div>
@@ -67,9 +80,10 @@ export function Plane() {
 
 interface PlaneDeployProps {
   deploy: Deploy
+  onDelete: (id: number) => void
 }
 function PlaneDeploy(props: PlaneDeployProps) {
-  const { deploy } = props
+  const { deploy, onDelete } = props
   const stats: Stats = {
     cpu: 18.09,
     memory: 40.23,
@@ -81,7 +95,7 @@ function PlaneDeploy(props: PlaneDeployProps) {
       <div className='plane-card-room'>
         <PlaneDeployRoom deploy={deploy}></PlaneDeployRoom>
         <PlaneSystemStatus stats={stats}></PlaneSystemStatus>
-        <Buttons deploy={deploy}></Buttons>
+        <Buttons deploy={deploy} onDelete={onDelete}></Buttons>
       </div>
       <Mods deploy={deploy}></Mods>
     </div>
@@ -89,7 +103,10 @@ function PlaneDeploy(props: PlaneDeployProps) {
 }
 
 
-function PlaneDeployRoom(props: PlaneDeployProps) {
+interface PlaneDeployRoomProps {
+  deploy: Deploy
+}
+function PlaneDeployRoom(props: PlaneDeployRoomProps) {
   const { deploy } = props
   const [clusterIni, setClusterIni] = useState<DeployClusterIni>(deploy.cluster.ini)
   const [clusterToken, setClusterToken] = useState<string>(deploy.cluster.cluster_token)
@@ -337,11 +354,16 @@ function PlaneSystemStatus(props: PlaneSystemStatusProps) {
 
 
 interface ButtonsProps {
-  deploy: Deploy
+  deploy: Deploy,
+  onDelete: (id: number) => void
+}
+interface ButtonStates {
+  deleting: boolean
 }
 function Buttons(props: ButtonsProps) {
+  const {deploy, onDelete} = props
+  const [states, setStates] = useState<ButtonStates>({ deleting: false })
   const [shareTip, setShareTip] = useState('分享')
-  const { deploy } = props
   async function handleShare() {
     let text = ""
     text = text + `房间: ${deploy.cluster.ini.cluster_name}\n`
@@ -354,6 +376,13 @@ function Buttons(props: ButtonsProps) {
   }
   const resetShareTip = () => {
     setShareTip('分享')
+  }
+  async function clickDelete() {
+    setStates({
+      ...states,
+      deleting: true,
+    })
+    onDelete(deploy.id)
   }
   return (
     <div className='buttons-box'>
@@ -381,20 +410,42 @@ function Buttons(props: ButtonsProps) {
           </svg>
         </Tooltip>
       </div>
-      <div className='buttons-box-item'>
-        <Tooltip tip='删除'>
-          <svg
-            fill="#3498db"
-            viewBox="0 0 1024 1024"
-            width="27"
-            height="27"
-          >
-            <path d="M607.897867 768.043004c-17.717453 0-31.994625-14.277171-31.994625-31.994625L575.903242 383.935495c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 351.94087C639.892491 753.593818 625.61532 768.043004 607.897867 768.043004z"></path>
-            <path d="M415.930119 768.043004c-17.717453 0-31.994625-14.277171-31.994625-31.994625L383.935495 383.935495c0-17.717453 14.277171-31.994625 31.994625-31.994625 17.717453 0 31.994625 14.277171 31.994625 31.994625l0 351.94087C447.924744 753.593818 433.647573 768.043004 415.930119 768.043004z"></path>
-            <path d="M928.016126 223.962372l-159.973123 0L768.043004 159.973123c0-52.980346-42.659499-95.983874-95.295817-95.983874L351.94087 63.989249c-52.980346 0-95.983874 43.003528-95.983874 95.983874l0 63.989249-159.973123 0c-17.717453 0-31.994625 14.277171-31.994625 31.994625s14.277171 31.994625 31.994625 31.994625l832.032253 0c17.717453 0 31.994625-14.277171 31.994625-31.994625S945.73358 223.962372 928.016126 223.962372zM319.946246 159.973123c0-17.545439 14.449185-31.994625 31.994625-31.994625l320.806316 0c17.545439 0 31.306568 14.105157 31.306568 31.994625l0 63.989249L319.946246 223.962372 319.946246 159.973123 319.946246 159.973123z"></path>
-            <path d="M736.048379 960.010751 288.123635 960.010751c-52.980346 0-95.983874-43.003528-95.983874-95.983874L192.139761 383.591466c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 480.435411c0 17.717453 14.449185 31.994625 31.994625 31.994625l448.096758 0c17.717453 0 31.994625-14.277171 31.994625-31.994625L768.215018 384.795565c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 479.231312C832.032253 916.835209 789.028725 960.010751 736.048379 960.010751z"></path>
-          </svg>
-        </Tooltip>
+      <div className='buttons-box-item' onClick={clickDelete}>
+        {states.deleting ?
+          <Tooltip tip='删除中'>
+            <svg
+              fill="#3498db"
+              viewBox="0 0 1024 1024"
+              width="27"
+              height="27"
+            >
+              <path d={LoadIcon}>
+                <animateTransform
+                  attributeType="xml"
+                  attributeName="transform"
+                  type="rotate"
+                  from="0 512 512"
+                  to="360 512 512"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+              </path>
+            </svg>
+          </Tooltip> :
+          <Tooltip tip='删除'>
+            <svg
+              fill="#3498db"
+              viewBox="0 0 1024 1024"
+              width="27"
+              height="27"
+            >
+              <path d="M607.897867 768.043004c-17.717453 0-31.994625-14.277171-31.994625-31.994625L575.903242 383.935495c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 351.94087C639.892491 753.593818 625.61532 768.043004 607.897867 768.043004z"></path>
+              <path d="M415.930119 768.043004c-17.717453 0-31.994625-14.277171-31.994625-31.994625L383.935495 383.935495c0-17.717453 14.277171-31.994625 31.994625-31.994625 17.717453 0 31.994625 14.277171 31.994625 31.994625l0 351.94087C447.924744 753.593818 433.647573 768.043004 415.930119 768.043004z"></path>
+              <path d="M928.016126 223.962372l-159.973123 0L768.043004 159.973123c0-52.980346-42.659499-95.983874-95.295817-95.983874L351.94087 63.989249c-52.980346 0-95.983874 43.003528-95.983874 95.983874l0 63.989249-159.973123 0c-17.717453 0-31.994625 14.277171-31.994625 31.994625s14.277171 31.994625 31.994625 31.994625l832.032253 0c17.717453 0 31.994625-14.277171 31.994625-31.994625S945.73358 223.962372 928.016126 223.962372zM319.946246 159.973123c0-17.545439 14.449185-31.994625 31.994625-31.994625l320.806316 0c17.545439 0 31.306568 14.105157 31.306568 31.994625l0 63.989249L319.946246 223.962372 319.946246 159.973123 319.946246 159.973123z"></path>
+              <path d="M736.048379 960.010751 288.123635 960.010751c-52.980346 0-95.983874-43.003528-95.983874-95.983874L192.139761 383.591466c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 480.435411c0 17.717453 14.449185 31.994625 31.994625 31.994625l448.096758 0c17.717453 0 31.994625-14.277171 31.994625-31.994625L768.215018 384.795565c0-17.717453 14.277171-31.994625 31.994625-31.994625s31.994625 14.277171 31.994625 31.994625l0 479.231312C832.032253 916.835209 789.028725 960.010751 736.048379 960.010751z"></path>
+            </svg>
+          </Tooltip>
+        }
       </div>
       <div className='buttons-box-item'>
         <Tooltip tip='保存并部署'>
