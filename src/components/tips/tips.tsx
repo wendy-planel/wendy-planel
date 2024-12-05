@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
 import './tips.css';
 
-interface HovertipProps {
+interface HoverTipProps {
   children: React.ReactNode
   tip: string
 }
-export const Hovertip = (props: HovertipProps) => {
+export const HoverTip = (props: HoverTipProps) => {
   const { children, tip } = props;
   const [visible, setVisible] = useState(false);
   const showTip = useCallback(() => setVisible(true), []);

@@ -11,7 +11,6 @@ export function isPublicIP(ip: string): boolean {
   )
 }
 
-
 export function extractFirstValidIP(text: string): string | null {
   const ipPattern = /\b(?:\d{1,3}\.){3}\d{1,3}\b/g
   const matches = text.match(ipPattern)

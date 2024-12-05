@@ -24,7 +24,6 @@ export function LeftNav() {
   )
 }
 
-
 export function TopNav() {
   return (
     <div className="top-nav-box">

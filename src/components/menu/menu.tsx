@@ -1,11 +1,3 @@
-/**
- * 菜单导航组件
- * 
- * 左菜单组件
- * 包含菜单项
- * 菜单图标 菜单点击
- * 
- */
 import React, { useState } from 'react'
 
 import './menu.css'
@@ -46,7 +38,6 @@ export function LeftMenu(props: LeftMenuProps) {
     </div>
   )
 }
-
 
 interface MenuItemProps {
   index?: number | undefined,
