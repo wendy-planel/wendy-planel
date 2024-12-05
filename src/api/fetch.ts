@@ -19,7 +19,11 @@ async function get<T>(url: string, params: any = null): Promise<T> {
   return data as T;
 }
 
-async function post<T>(url: string, params: any = null, body: any = null): Promise<T> {
+async function post<T>(
+  url: string,
+  params: any = null,
+  body: any = null,
+): Promise<T> {
   let full_url = url;
   if (params) {
     const queryString = new URLSearchParams(
@@ -34,10 +38,8 @@ async function post<T>(url: string, params: any = null, body: any = null): Promi
   }
   const response = await fetch(full_url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : null,
+    headers: { 'Content-Type': 'application/json' },
+    body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
   });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

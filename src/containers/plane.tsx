@@ -1,11 +1,11 @@
 import { produce } from "immer"
 import { saveAs } from 'file-saver'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import './styles/plane.css'
-import { Deploy } from '../api'
+import { Deploy, Mod as ModAPI } from '../api'
 import { HoverTip } from "../components/tips"
-import { Deploy as DeploySchema } from '../common/interface'
+import { Deploy as DeploySchema, PublishedFileDetail } from '../common/interface'
 import { isPublicIP, extractFirstValidIP } from '../common/tools'
 import {
   LoadIcon,
@@ -37,7 +37,7 @@ function getConnection(deploy: DeploySchema) {
 }
 
 export function Plane() {
-  const [deploy, setDeploy] = useState<[DeploySchema]>()
+  const [deploy, setDeploy] = useState<DeploySchema[]>()
   async function loadData() {
     const data = await Deploy.read()
     data.sort((a, b) => {
@@ -544,12 +544,26 @@ function ButtonBox(props: ButtonBoxProps) {
 }
 
 interface ModsProps {
-  deploy: DeploySchema
+  deploy: DeploySchema;
 }
 function Mods(props: ModsProps) {
-  const { deploy } = props
-  return (
-    <div>
-    </div>
-  )
+  const { deploy } = props;
+  const [publishedFileDetails, setPublishedFileDetails] = useState<PublishedFileDetail[]>([]);
+  // 使用 useCallback 缓存函数
+  const loadPublishedFileDetail = useCallback(async () => {
+    const mods: string[] = [];
+    if (deploy.cluster.world) {
+      const regex = /workshop-([0-9]+)/g;
+      let match;
+      while ((match = regex.exec(deploy.cluster.world[0].modoverrides)) !== null) {
+        mods.push(match[1]);
+      }
+      if (mods.length > 0) {
+        setPublishedFileDetails(await ModAPI.read(mods));
+      }
+    }
+  }, [deploy]);
+  useEffect(() => { loadPublishedFileDetail() }, [loadPublishedFileDetail]);
+  console.log(publishedFileDetails);
+  return <div></div>;
 }
