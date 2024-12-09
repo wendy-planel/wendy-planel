@@ -92,7 +92,7 @@ function PlaneDeploy(props: PlaneDeployProps) {
           onDelete={props.onDelete}
         ></ButtonBox>
       </div>
-      <Mods deploy={deploy}></Mods>
+      <ModBox deploy={deploy}></ModBox>
     </div>
   )
 }
@@ -543,12 +543,40 @@ function ButtonBox(props: ButtonBoxProps) {
   )
 }
 
-interface ModsProps {
+
+interface ModProps {
+  publishedfiledetail: PublishedFileDetail;
+}
+function Mod(modprops: ModProps) {
+  const { publishedfiledetail } = modprops
+  return (
+    <div className="mod-item">
+      <img src={publishedfiledetail.preview_url} />
+      <div className="mod-item-left">
+        <div className="mod-item-title">{publishedfiledetail.title}</div>
+        <div className="mod-item-button">
+          <div>编辑</div>
+          <div>删除</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+function SearchMod() {
+  return (
+    <div></div>
+  )
+}
+
+
+interface ModBoxProps {
   deploy: DeploySchema;
 }
-function Mods(props: ModsProps) {
+function ModBox(props: ModBoxProps) {
   const { deploy } = props;
-  const [publishedFileDetails, setPublishedFileDetails] = useState<PublishedFileDetail[]>([]);
+  const [publishedfiledetails, setPublishedFileDetails] = useState<PublishedFileDetail[]>([]);
   // 使用 useCallback 缓存函数
   const loadPublishedFileDetail = useCallback(async () => {
     const mods: string[] = [];
@@ -564,6 +592,22 @@ function Mods(props: ModsProps) {
     }
   }, [deploy]);
   useEffect(() => { loadPublishedFileDetail() }, [loadPublishedFileDetail]);
-  console.log(publishedFileDetails);
-  return <div></div>;
+  console.log(publishedfiledetails);
+  return (
+    <div className="mod-box">
+      <SearchMod></SearchMod>
+      <div>搜索显示内容</div>
+      <div className="mod-box-separation-line"></div>
+      <div className="mod-box-added">
+        {
+          publishedfiledetails?.map(function (item) {
+            return <Mod
+              publishedfiledetail={item}
+            >
+            </Mod>
+          })
+        }
+      </div>
+    </div>
+  );
 }
