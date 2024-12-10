@@ -16,6 +16,16 @@ async function read(mods: string[]): Promise<PublishedFileDetail[]> {
     return detail.response.publishedfiledetails
 }
 
+
+async function search(search_text: string): Promise<PublishedFileDetail[]> {
+    const detail = await Fetch.post<PublishedFileDetailResponse>('/api/mod/search', null, {
+        search_text: search_text,
+    })
+    return detail.response.publishedfiledetails
+}
+
+
 export const Mod = {
-    read: read
+    read: read,
+    search: search,
 }

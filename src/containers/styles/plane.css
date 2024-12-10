@@ -135,11 +135,8 @@ input::-webkit-inner-spin-button {
 }
 
 .stats-box-text {
-    margin-left: 1%;
-}
-
-.stats-box-date {
-    font-size: 0.6rem;
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
 }
 
 .buttons-box {
@@ -192,8 +189,8 @@ input::-webkit-inner-spin-button {
 }
 
 .mod-item img {
-    width: 3rem;
-    height: 3rem;
+    width: 2.8rem;
+    height: 2.8rem;
 }
 
 .mod-item-left {
@@ -225,7 +222,7 @@ input::-webkit-inner-spin-button {
 }
 
 .mod-box-added {
-    height: 50%;
+    height: 45%;
     overflow-y: auto;
 }
 
@@ -244,5 +241,49 @@ input::-webkit-inner-spin-button {
 }
 
 .mod-box-added::-webkit-scrollbar-corner {
+    background: none;
+}
+
+.search-mod {
+    width: 100%;
+    height: 2rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background:  #111418;
+    border-radius: 1rem;
+}
+
+.search-mod input {
+    width: 80%;
+    background-color: transparent;
+    border: none;
+    height: 100%;
+    color: #ffff;
+    margin-left: 0.5rem;
+    outline: none;
+}
+
+.mod-box-search {
+    margin-top: 1rem;
+    height: 28%;
+    overflow-y: auto;
+}
+
+/* 自定义滚动条样式 */
+.mod-box-search::-webkit-scrollbar {
+    width: 0.8rem; /* 滚动条宽度 */
+}
+
+.mod-box-search::-webkit-scrollbar-track {
+    border-radius: 1rem;
+}
+
+.mod-box-search::-webkit-scrollbar-thumb {
+    background:  #111418;
+    border-radius: 1rem;
+}
+
+.mod-box-search::-webkit-scrollbar-corner {
     background: none;
 }

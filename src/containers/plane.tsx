@@ -354,17 +354,15 @@ function SystemInfo(props: SystemInfoProps) {
         <div className='stats-box-text'>{stats.memory}%</div>
       </div>
       <div className='stats-box-item'>
-        <div className='stats-box-date'>{stats.read.slice(0, 16)}</div>
-        <HoverTip tip={stats.status == 'running' ? '运行中' : '已停止'}>
-          <svg
-            viewBox="0 0 1024 1024"
-            width="18"
-            height="18"
-            fill={stats.status == 'running' ? '#00ff00' : '#ff0000'}
-          >
-            <path d="M514.048 128q79.872 0 149.504 30.208t121.856 82.432 82.432 122.368 30.208 150.016q0 78.848-30.208 148.48t-82.432 121.856-121.856 82.432-149.504 30.208-149.504-30.208-121.856-82.432-82.432-121.856-30.208-148.48q0-79.872 30.208-150.016t82.432-122.368 121.856-82.432 149.504-30.208z"></path>
-          </svg>
-        </HoverTip>
+        <div className='stats-box-text'>{stats.status == 'running' ? '运行' : '停止'}</div>
+        <svg
+          viewBox="0 0 1024 1024"
+          width="18"
+          height="18"
+          fill={stats.status == 'running' ? '#00ff00' : '#ff0000'}
+        >
+          <path d="M514.048 128q79.872 0 149.504 30.208t121.856 82.432 82.432 122.368 30.208 150.016q0 78.848-30.208 148.48t-82.432 121.856-121.856 82.432-149.504 30.208-149.504-30.208-121.856-82.432-82.432-121.856-30.208-148.48q0-79.872 30.208-150.016t82.432-122.368 121.856-82.432 149.504-30.208z"></path>
+        </svg>
       </div>
     </div>
   )
@@ -564,9 +562,39 @@ function Mod(modprops: ModProps) {
 }
 
 
-function SearchMod() {
+interface SearchModProps {
+  setSearch: React.Dispatch<React.SetStateAction<PublishedFileDetail[]>>,
+  publishedfiledetails: PublishedFileDetail[],
+}
+function SearchMod(props: SearchModProps) {
+  const [key, setKey] = useState<string>('')
+  const publishedfiledetails: string[] = []
+  props.publishedfiledetails.forEach(item => publishedfiledetails.push(item.publishedfileid))
+  async function handleSearch() {
+    const search = await ModAPI.search(key)
+    const filtered = search.filter(
+      item => item.publishedfileid && !publishedfiledetails.includes(item.publishedfileid)
+    )
+    props.setSearch(filtered)
+  }
   return (
-    <div></div>
+    <div className="search-mod">
+      <input
+        placeholder="搜索模组"
+        value={key} onChange={(e) => setKey(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+      ></input>
+      <div onClick={handleSearch}>
+        <svg
+          viewBox="0 0 1024 1024"
+          width="24"
+          height="24"
+          fill="#3498db"
+        >
+          <path d="M480 128a352 352 0 0 1 270.528 577.28l138.24 138.24c10.752 10.496 9.28 29.312-3.2 42.112-12.8 12.48-31.616 13.888-42.048 3.136l-138.24-138.24A352 352 0 1 1 480 128z m0 63.36c-182.72 0-288.128 147.2-288.128 288.64s105.088 289.28 288 289.28c182.848 0 288-147.84 288-289.28 0-141.44-105.152-288.64-287.872-288.64z"></path>
+        </svg>
+      </div>
+    </div>
   )
 }
 
@@ -577,7 +605,7 @@ interface ModBoxProps {
 function ModBox(props: ModBoxProps) {
   const { deploy } = props;
   const [publishedfiledetails, setPublishedFileDetails] = useState<PublishedFileDetail[]>([]);
-  // 使用 useCallback 缓存函数
+  const [search, setSearch] = useState<PublishedFileDetail[]>([]);
   const loadPublishedFileDetail = useCallback(async () => {
     const mods: string[] = [];
     if (deploy.cluster.world) {
@@ -592,19 +620,23 @@ function ModBox(props: ModBoxProps) {
     }
   }, [deploy]);
   useEffect(() => { loadPublishedFileDetail() }, [loadPublishedFileDetail]);
-  console.log(publishedfiledetails);
   return (
     <div className="mod-box">
-      <SearchMod></SearchMod>
-      <div>搜索显示内容</div>
+      <SearchMod setSearch={setSearch} publishedfiledetails={publishedfiledetails}></SearchMod>
+      {
+        search.length > 0 && <div className="mod-box-search">
+          {
+            search?.map(function (item, index) {
+              return <Mod key={index} publishedfiledetail={item}></Mod>
+            })
+          }
+        </div>
+      }
       <div className="mod-box-separation-line"></div>
       <div className="mod-box-added">
         {
-          publishedfiledetails?.map(function (item) {
-            return <Mod
-              publishedfiledetail={item}
-            >
-            </Mod>
+          publishedfiledetails?.map(function (item, index) {
+            return <Mod key={index} publishedfiledetail={item}></Mod>
           })
         }
       </div>
