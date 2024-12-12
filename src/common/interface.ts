@@ -50,32 +50,39 @@ export interface Deploy {
 
 
 export interface Tag {
-	tag: string;
+	tag: string
 }
 
 export interface PublishedFileDetail {
-	publishedfileid: string;
-	result: number;
-	creator: string;
-	creator_app_id: number;
-	consumer_app_id: number;
-	filename: string;
-	file_size: string;
-	file_url: string;
-	hcontent_file: string;
-	preview_url: string;
-	hcontent_preview: string;
-	title: string;
-	description: string;
-	time_created: number;
-	time_updated: number;
-	visibility: number;
-	banned: number;
-	ban_reason: string;
-	subscriptions: number;
-	favorited: number;
-	lifetime_subscriptions: number;
-	lifetime_favorited: number;
-	views: number;
-	tags: Tag[];
+	publishedfileid: string
+	result: number
+	creator: string
+	creator_app_id: number
+	consumer_app_id: number
+	filename: string
+	file_size: string
+	file_url: string
+	hcontent_file: string
+	preview_url: string
+	hcontent_preview: string
+	title: string
+	description: string
+	time_created: number
+	time_updated: number
+	visibility: number
+	banned: number
+	ban_reason: string
+	subscriptions: number
+	favorited: number
+	lifetime_subscriptions: number
+	lifetime_favorited: number
+	views: number
+	tags: Tag[]
+    code?: string
+    configuration_options?: object
+}
+
+export interface ModConfig {
+    id: string
+    code: string
 }
