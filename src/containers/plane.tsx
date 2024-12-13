@@ -19,7 +19,7 @@ import {
   ClickCopyIcon,
 } from "../common/svg"
 
-const factory = new LuaFactory("./assets/wasm/glue.wasm")
+const factory = new LuaFactory("./public/assets/wasm/glue.wasm")
 
 function getConnection(deploy: DeploySchema) {
   const port = deploy.cluster.ini.master_port

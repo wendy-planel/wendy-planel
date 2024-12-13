@@ -6,12 +6,15 @@ export function LeftNav() {
   return (
     <LeftMenu current={2}>
       <div className="left-nav-title">温蒂面板</div>
-      <img className="left-nav-avatar" src="./assets/images/wendy.png"></img>
+      <img
+        className="left-nav-avatar"
+        src="./public/assets/images/wendy.png"
+      ></img>
       <MenuItem>
         <div>
           <img
             className="left-nav-icon"
-            src="./assets/images/flysheet.png"
+            src="./public/assets/images/flysheet.png"
           ></img>
           <div>面板信息</div>
         </div>
@@ -20,7 +23,7 @@ export function LeftNav() {
         <div>
           <img
             className="left-nav-icon"
-            src="./assets/images/portabletent.png"
+            src="./public/assets/images/portabletent.png"
           ></img>
           <div>大厅查询</div>
         </div>
