@@ -16,7 +16,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
     ).toString()
     full_url += queryString
   }
-  const response = await fetch(HOST + full_url, { method: "GET" })
+  const response = await fetch(HOST + full_url, { method: "GET", mode: "cors" })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
@@ -48,6 +48,7 @@ async function post<T>(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
+    mode: "cors",
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
@@ -82,6 +83,7 @@ async function del<T>(
       "Content-Type": "application/json",
     },
     body: body ? JSON.stringify(body) : null,
+    mode: "cors",
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
@@ -116,6 +118,7 @@ async function put<T>(
       "Content-Type": "application/json",
     },
     body: body ? JSON.stringify(body) : null,
+    mode: "cors",
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
