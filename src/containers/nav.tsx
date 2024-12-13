@@ -1,7 +1,6 @@
-import './styles/nav.css'
-import { GitHubIcon } from '../common/svg'
-import { LeftMenu, MenuItem } from "../components/menu"
-
+import "./styles/nav.css";
+import { GitHubIcon } from "../common/svg";
+import { LeftMenu, MenuItem } from "../components/menu";
 
 export function LeftNav() {
   return (
@@ -10,18 +9,24 @@ export function LeftNav() {
       <img className="left-nav-avatar" src="./assets/images/wendy.png"></img>
       <MenuItem>
         <div>
-          <img className="left-nav-icon" src="./assets/images/flysheet.png"></img>
+          <img
+            className="left-nav-icon"
+            src="./assets/images/flysheet.png"
+          ></img>
           <div>面板信息</div>
         </div>
       </MenuItem>
       <MenuItem>
         <div>
-          <img className="left-nav-icon" src="./assets/images/portabletent.png"></img>
+          <img
+            className="left-nav-icon"
+            src="./assets/images/portabletent.png"
+          ></img>
           <div>大厅查询</div>
         </div>
       </MenuItem>
     </LeftMenu>
-  )
+  );
 }
 
 export function TopNav() {
@@ -42,5 +47,5 @@ export function TopNav() {
         </a>
       </div>
     </div>
-  )
+  );
 }

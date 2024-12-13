@@ -1,36 +1,36 @@
 .hovertip-container {
-    display: inline-block;
-    position: relative;
+  display: inline-block;
+  position: relative;
 }
 
 .hovertip {
-    position: absolute;
-    bottom: -3rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #485565;
-    color: white;
-    padding: 0.4rem;
-    border-radius: 2%;
-    white-space: nowrap;
-    z-index: 1000;
-    opacity: 0; /* 初始状态隐藏 */
-    visibility: hidden; /* 初始状态隐藏 */
-    transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
+  position: absolute;
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #485565;
+  color: white;
+  padding: 0.4rem;
+  border-radius: 2%;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0; /* 初始状态隐藏 */
+  visibility: hidden; /* 初始状态隐藏 */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
 }
 
 .hovertip::after {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 0.3125rem;
-    border-style: solid;
-    border-color: transparent transparent #485565 transparent;
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0.3125rem;
+  border-style: solid;
+  border-color: transparent transparent #485565 transparent;
 }
 
 .hovertip-container:hover .hovertip {
-    opacity: 0.75; /* 鼠标悬停时显示 */
-    visibility: visible; /* 鼠标悬停时显示 */
+  opacity: 0.75; /* 鼠标悬停时显示 */
+  visibility: visible; /* 鼠标悬停时显示 */
 }

@@ -1,1 +1,1 @@
-export * from './tips'
+export * from "./tips";

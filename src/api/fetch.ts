@@ -11,7 +11,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
     ).toString();
     full_url += queryString;
   }
-  const response = await fetch(full_url, { method: 'GET' });
+  const response = await fetch(full_url, { method: "GET" });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -22,7 +22,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
 async function post<T>(
   url: string,
   params: any = null,
-  body: any = null,
+  body: any = null
 ): Promise<T> {
   let full_url = url;
   if (params) {
@@ -37,8 +37,8 @@ async function post<T>(
     full_url += queryString;
   }
   const response = await fetch(full_url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
   });
   if (!response.ok) {
@@ -48,7 +48,11 @@ async function post<T>(
   return data as T;
 }
 
-async function del<T>(url: string, params: any = null, body: any = null): Promise<T> {
+async function del<T>(
+  url: string,
+  params: any = null,
+  body: any = null
+): Promise<T> {
   let full_url = url;
   if (params) {
     const queryString = new URLSearchParams(
@@ -62,9 +66,9 @@ async function del<T>(url: string, params: any = null, body: any = null): Promis
     full_url += queryString;
   }
   const response = await fetch(full_url, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: body ? JSON.stringify(body) : null,
   });
@@ -75,7 +79,11 @@ async function del<T>(url: string, params: any = null, body: any = null): Promis
   return data as T;
 }
 
-async function put<T>(url: string, params: any = null, body: any = null): Promise<T> {
+async function put<T>(
+  url: string,
+  params: any = null,
+  body: any = null
+): Promise<T> {
   let full_url = url;
   if (params) {
     const queryString = new URLSearchParams(
@@ -89,9 +97,9 @@ async function put<T>(url: string, params: any = null, body: any = null): Promis
     full_url += queryString;
   }
   const response = await fetch(full_url, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: body ? JSON.stringify(body) : null,
   });
@@ -107,4 +115,4 @@ export const Fetch = {
   post: post,
   delete: del,
   put: put,
-}
+};
