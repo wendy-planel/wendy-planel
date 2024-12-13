@@ -1,21 +1,21 @@
-import { Fetch } from "./fetch";
-import { ModInfo, PublishedFileDetail } from "../common/interface";
+import { Fetch } from "./fetch"
+import { ModInfo, PublishedFileDetail } from "../common/interface"
 
 interface _PublishedFileDetail {
-  result: number;
-  resultcount: number;
-  publishedfiledetails: PublishedFileDetail[];
+  result: number
+  resultcount: number
+  publishedfiledetails: PublishedFileDetail[]
 }
 interface PublishedFileDetailResponse {
-  response: _PublishedFileDetail;
+  response: _PublishedFileDetail
 }
 async function read(mods: string[]): Promise<PublishedFileDetail[]> {
   const detail = await Fetch.post<PublishedFileDetailResponse>(
     "/api/mod/publishedfiledetails",
     null,
-    mods
-  );
-  return detail.response.publishedfiledetails;
+    mods,
+  )
+  return detail.response.publishedfiledetails
 }
 
 async function search(search_text: string): Promise<PublishedFileDetail[]> {
@@ -24,17 +24,17 @@ async function search(search_text: string): Promise<PublishedFileDetail[]> {
     null,
     {
       search_text: search_text,
-    }
-  );
-  return detail.response.publishedfiledetails;
+    },
+  )
+  return detail.response.publishedfiledetails
 }
 
 async function readConfig(mods: string[]) {
-  return await Fetch.post<ModInfo[]>("/api/mod/info", null, mods);
+  return await Fetch.post<ModInfo[]>("/api/mod/info", null, mods)
 }
 
 export const Mod = {
   read: read,
   search: search,
   readConfig: readConfig,
-};
+}

@@ -16,7 +16,9 @@
   z-index: 1000;
   opacity: 0; /* 初始状态隐藏 */
   visibility: hidden; /* 初始状态隐藏 */
-  transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease; /* 添加过渡效果 */
 }
 
 .hovertip::after {

@@ -1,16 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from "react"
 
-import "./tips.css";
+import "./tips.css"
 
 interface HoverTipProps {
-  children: React.ReactNode;
-  tip: string;
+  children: React.ReactNode
+  tip: string
 }
 export const HoverTip = (props: HoverTipProps) => {
-  const { children, tip } = props;
-  const [visible, setVisible] = useState(false);
-  const showTip = useCallback(() => setVisible(true), []);
-  const hideTip = useCallback(() => setVisible(false), []);
+  const { children, tip } = props
+  const [visible, setVisible] = useState(false)
+  const showTip = useCallback(() => setVisible(true), [])
+  const hideTip = useCallback(() => setVisible(false), [])
   return (
     <div
       className="hovertip-container"
@@ -20,5 +20,5 @@ export const HoverTip = (props: HoverTipProps) => {
       {children}
       <div className={`hovertip ${visible ? "visible" : ""}`}>{tip}</div>
     </div>
-  );
-};
+  )
+}

@@ -1,6 +1,6 @@
-import "./styles/nav.css";
-import { GitHubIcon } from "../common/svg";
-import { LeftMenu, MenuItem } from "../components/menu";
+import "./styles/nav.css"
+import { GitHubIcon } from "../common/svg"
+import { LeftMenu, MenuItem } from "../components/menu"
 
 export function LeftNav() {
   return (
@@ -26,7 +26,7 @@ export function LeftNav() {
         </div>
       </MenuItem>
     </LeftMenu>
-  );
+  )
 }
 
 export function TopNav() {
@@ -47,5 +47,5 @@ export function TopNav() {
         </a>
       </div>
     </div>
-  );
+  )
 }

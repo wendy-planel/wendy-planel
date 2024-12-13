@@ -1,69 +1,69 @@
-import { produce } from "immer";
-import { saveAs } from "file-saver";
-import { LuaFactory } from "wasmoon";
-import React, { useEffect, useState } from "react";
+import { produce } from "immer"
+import { saveAs } from "file-saver"
+import { LuaFactory } from "wasmoon"
+import React, { useEffect, useState } from "react"
 
-import "./styles/plane.css";
-import { HoverTip } from "../components/tips";
-import { Deploy, Mod as ModAPI } from "../api";
-import { isPublicIP, extractFirstValidIP } from "../common/tools";
+import "./styles/plane.css"
+import { HoverTip } from "../components/tips"
+import { Deploy, Mod as ModAPI } from "../api"
+import { isPublicIP, extractFirstValidIP } from "../common/tools"
 import {
   Deploy as DeploySchema,
   PublishedFileDetail,
-} from "../common/interface";
+} from "../common/interface"
 import {
   LoadIcon,
   StopIcon,
   CopyIcon,
   LaunchIcon,
   ClickCopyIcon,
-} from "../common/svg";
+} from "../common/svg"
 
-const factory = new LuaFactory("./assets/wasm/glue.wasm");
+const factory = new LuaFactory("./assets/wasm/glue.wasm")
 
 function getConnection(deploy: DeploySchema) {
-  const port = deploy.cluster.ini.master_port;
-  const password = deploy.cluster.ini.cluster_password;
-  const urlObj = new URL(window.location.href);
-  let ip: string = urlObj.hostname;
+  const port = deploy.cluster.ini.master_port
+  const password = deploy.cluster.ini.cluster_password
+  const urlObj = new URL(window.location.href)
+  let ip: string = urlObj.hostname
   if (isPublicIP(deploy.cluster.ini.master_ip)) {
-    ip = deploy.cluster.ini.master_ip;
+    ip = deploy.cluster.ini.master_ip
   }
   for (const world of deploy.cluster.world) {
     if (
       world.type === "Master" &&
       world.docker_api != "unix:///var/run/docker.sock"
     ) {
-      const docker_ip = extractFirstValidIP(world.docker_api);
+      const docker_ip = extractFirstValidIP(world.docker_api)
       if (docker_ip) {
-        ip = docker_ip;
-        break;
+        ip = docker_ip
+        break
       }
     }
   }
-  return `c_connect("${ip}", ${port}, "${password}")`;
+  return `c_connect("${ip}", ${port}, "${password}")`
 }
 
 export function Plane() {
-  const [deploy, setDeploy] = useState<DeploySchema[]>();
+  const [deploy, setDeploy] = useState<DeploySchema[]>()
   async function loadData() {
-    const data = await Deploy.read();
+    const data = await Deploy.read()
     data.sort((a, b) => {
       if (a.status === b.status) {
-        return new Date(b.updated_at) < new Date(a.updated_at) ? 1 : -1;
+        return new Date(b.updated_at) < new Date(a.updated_at) ? 1 : -1
       } else {
-        return a.status !== "running" && b.status === "running" ? 1 : -1;
+        return a.status !== "running" && b.status === "running" ? 1 : -1
       }
-    });
-    setDeploy(data);
+    })
+    setDeploy(data)
   }
   async function handleDelete(id: number) {
-    await Deploy.delete(id);
-    await loadData();
+    await Deploy.delete(id)
+    await loadData()
   }
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData()
+  }, [])
   return (
     <div className="plane-box">
       {deploy?.map(function (item) {
@@ -73,24 +73,24 @@ export function Plane() {
             deploy={item}
             onDelete={handleDelete}
           ></PlaneDeploy>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
 interface PlaneDeployProps {
-  deploy: DeploySchema;
-  onDelete: (id: number) => void;
+  deploy: DeploySchema
+  onDelete: (id: number) => void
 }
 function PlaneDeploy(props: PlaneDeployProps) {
-  const [deploy, setDeploy] = useState<DeploySchema>(props.deploy);
+  const [deploy, setDeploy] = useState<DeploySchema>(props.deploy)
   const stats: Stats = {
     cpu: 18.09,
     memory: 40.23,
     read: "2015-01-08T22:57:31.547920715Z",
     status: deploy.status,
-  };
+  }
   return (
     <div className="plane-card">
       <div className="plane-card-room">
@@ -100,94 +100,94 @@ function PlaneDeploy(props: PlaneDeployProps) {
       </div>
       <ModBox deploy={deploy}></ModBox>
     </div>
-  );
+  )
 }
 
 interface DeployRoomProps {
-  deploy: DeploySchema;
-  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>;
+  deploy: DeploySchema
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 function DeployRoom(props: DeployRoomProps) {
-  const { deploy, setDeploy } = props;
+  const { deploy, setDeploy } = props
   const handleClusterIniMasterPort = (master_port: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.master_port = parseInt(master_port);
-      })
-    );
-  };
+        draft.cluster.ini.master_port = parseInt(master_port)
+      }),
+    )
+  }
   const handleClusterIniMasterIp = (master_ip: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.master_ip = master_ip;
-      })
-    );
-  };
+        draft.cluster.ini.master_ip = master_ip
+      }),
+    )
+  }
   const handleClusterIniMaxPlayers = (max_players: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.max_players = parseInt(max_players);
-      })
-    );
-  };
+        draft.cluster.ini.max_players = parseInt(max_players)
+      }),
+    )
+  }
   const handleClusterIniClusterPassword = (cluster_password: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.cluster_password = cluster_password;
-      })
-    );
-  };
+        draft.cluster.ini.cluster_password = cluster_password
+      }),
+    )
+  }
   const handleClusterIniClusterName = (cluster_name: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.cluster_name = cluster_name;
-      })
-    );
-  };
+        draft.cluster.ini.cluster_name = cluster_name
+      }),
+    )
+  }
   const handleClusterIniClusterDescription = (cluster_description: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.cluster_description = cluster_description;
-      })
-    );
-  };
+        draft.cluster.ini.cluster_description = cluster_description
+      }),
+    )
+  }
   const handleClusterToken = (cluster_token: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.cluster_token = cluster_token;
-      })
-    );
-  };
+        draft.cluster.cluster_token = cluster_token
+      }),
+    )
+  }
   const handleClusterIniGameMode = (
-    game_mode: "survival" | "endless" | "wilderness"
+    game_mode: "survival" | "endless" | "wilderness",
   ) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.game_mode = game_mode;
-      })
-    );
-  };
+        draft.cluster.ini.game_mode = game_mode
+      }),
+    )
+  }
   const handleClusterIniPvp = (enable: boolean) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.pvp = enable;
-      })
-    );
-  };
+        draft.cluster.ini.pvp = enable
+      }),
+    )
+  }
   const handleClusterIniVote = (enable: boolean) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.vote_enabled = enable;
-      })
-    );
-  };
-  const [copyPath, setCopyPath] = useState<string>(CopyIcon);
+        draft.cluster.ini.vote_enabled = enable
+      }),
+    )
+  }
+  const [copyPath, setCopyPath] = useState<string>(CopyIcon)
   async function clickCopyButton() {
-    await navigator.clipboard.writeText(getConnection(deploy));
-    setCopyPath(ClickCopyIcon);
+    await navigator.clipboard.writeText(getConnection(deploy))
+    setCopyPath(ClickCopyIcon)
     setTimeout(() => {
-      setCopyPath(CopyIcon);
-    }, 500);
+      setCopyPath(CopyIcon)
+    }, 500)
   }
   return (
     <div>
@@ -342,20 +342,20 @@ function DeployRoom(props: DeployRoomProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 interface Stats {
-  cpu: number;
-  memory: number;
-  read: string;
-  status: "running" | "pending" | "stop";
+  cpu: number
+  memory: number
+  read: string
+  status: "running" | "pending" | "stop"
 }
 interface SystemInfoProps {
-  stats: Stats;
+  stats: Stats
 }
 function SystemInfo(props: SystemInfoProps) {
-  const { stats } = props;
+  const { stats } = props
   return (
     <div className="stats-box">
       <div className="stats-box-item">
@@ -388,19 +388,19 @@ function SystemInfo(props: SystemInfoProps) {
         </svg>
       </div>
     </div>
-  );
+  )
 }
 
 interface ButtonProps {
-  tip: string;
-  children: React.ReactNode;
-  load: boolean;
-  load_tip: string;
-  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
-  onMouseLeave?: React.MouseEventHandler<HTMLDivElement> | undefined;
+  tip: string
+  children: React.ReactNode
+  load: boolean
+  load_tip: string
+  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined
+  onMouseLeave?: React.MouseEventHandler<HTMLDivElement> | undefined
 }
 function Button(props: ButtonProps) {
-  const { tip, children, load, load_tip, onClick, onMouseLeave } = props;
+  const { tip, children, load, load_tip, onClick, onMouseLeave } = props
   return (
     <div
       className="buttons-box-item"
@@ -431,80 +431,80 @@ function Button(props: ButtonProps) {
         </HoverTip>
       )}
     </div>
-  );
+  )
 }
 
 interface ButtonBoxStates {
-  deleting: boolean;
-  downloading: boolean;
-  deploying: boolean;
-  executing: boolean;
+  deleting: boolean
+  downloading: boolean
+  deploying: boolean
+  executing: boolean
 }
 interface ButtonBoxProps {
-  deploy: DeploySchema;
-  onDelete: (id: number) => void;
+  deploy: DeploySchema
+  onDelete: (id: number) => void
 }
 function ButtonBox(props: ButtonBoxProps) {
-  const { deploy, onDelete } = props;
-  const [shareTip, setShareTip] = useState("分享");
+  const { deploy, onDelete } = props
+  const [shareTip, setShareTip] = useState("分享")
   const [states, setStates] = useState<ButtonBoxStates>({
     deleting: false,
     downloading: false,
     deploying: false,
     executing: false,
-  });
+  })
   async function handleShare() {
-    let text = "";
-    text = text + `房间: ${deploy.cluster.ini.cluster_name}\n`;
-    text = text + `玩家: ${deploy.cluster.ini.max_players}\n`;
-    text = text + `密码: ${deploy.cluster.ini.cluster_password}\n`;
-    text = text + `描述: ${deploy.cluster.ini.cluster_description}\n`;
-    text = text + `直连: ${getConnection(deploy)}\n`;
-    await navigator.clipboard.writeText(text);
-    setShareTip("成功复制");
+    let text = ""
+    text = text + `房间: ${deploy.cluster.ini.cluster_name}\n`
+    text = text + `玩家: ${deploy.cluster.ini.max_players}\n`
+    text = text + `密码: ${deploy.cluster.ini.cluster_password}\n`
+    text = text + `描述: ${deploy.cluster.ini.cluster_description}\n`
+    text = text + `直连: ${getConnection(deploy)}\n`
+    await navigator.clipboard.writeText(text)
+    setShareTip("成功复制")
   }
   async function clickDelete() {
     setStates({
       ...states,
       deleting: true,
-    });
-    onDelete(deploy.id);
+    })
+    onDelete(deploy.id)
   }
   async function clickDownload() {
     setStates({
       ...states,
       downloading: true,
-    });
+    })
     try {
       const response = await fetch(`api/cluster/download/${deploy.id}`, {
         method: "GET",
-      });
+      })
       if (!response.ok) {
-        throw new Error("File download failed");
+        throw new Error("File download failed")
       }
-      const blob = await response.blob();
+      const blob = await response.blob()
       const filename =
         response.headers.get("Content-Disposition")?.split("filename=")[1] ||
-        "downloaded-file";
-      saveAs(blob, filename);
+        "downloaded-file"
+      saveAs(blob, filename)
     } catch (error) {
-      console.error("Download error:", error);
+      console.error("Download error:", error)
     }
     setStates({
       ...states,
       downloading: false,
-    });
+    })
   }
   async function clickSave() {
     setStates({
       ...states,
       deploying: true,
-    });
-    await Deploy.update(deploy.id, deploy);
+    })
+    await Deploy.update(deploy.id, deploy)
     setStates({
       ...states,
       deploying: false,
-    });
+    })
   }
   return (
     <div className="buttons-box">
@@ -514,7 +514,7 @@ function ButtonBox(props: ButtonBoxProps) {
         load_tip={shareTip}
         onClick={handleShare}
         onMouseLeave={() => {
-          setShareTip("分享");
+          setShareTip("分享")
         }}
       >
         <path d="M1016.1904 93.352c-7.7152-8.776-19.96-12.7344-31.7152-9.552L23.1664 343.5216c-11.3072 3.0608-19.8992 12.0816-22.4288 23.5104-2.5104 11.4288 1.4896 23.2256 10.4704 30.776L239.008 589.1184l104.5536 290.456c4.1232 11.3872 14.552 19.4704 26.4704 20.5712l3.1232 0.1632c10.96 0 21.2448-5.8784 26.8576-15.3472l63.0016-106.2064 181.2496 154.984c5.632 4.8576 12.8976 7.552 20.368 7.552 2.6944 0 5.1424-0.2864 7.3056-0.8576 9.7152-2.3264 17.8368-9.224 21.7152-18.5312l327.968-795.856C1026.192 115.1072 1024.0688 102.2496 1016.1904 93.352zM617.0784 426.992l-119.6976 158.7792c-5.0608 6.6944-7.2048 14.9392-6.0416 23.2256 1.1632 8.2864 5.4896 15.6336 12.2048 20.736 13.3264 10 33.8176 7.1024 43.8784-6.2048L745.8992 360.256c8.7344-11.6736 8.368-27.6336-0.8576-38.736-9.0608-11.0208-25.3072-14.5312-37.96-8.2864l-439.44 214.6576c-0.8368 0.408-1.632 0.8576-2.4288 1.3472L97.4736 388.3792l841.9792-227.4336L652.1408 858.024l-176.6976-151.1472c-5.6736-4.816-12.9184-7.5104-20.3888-7.5104-1.6128 0-3.2448 0.1632-5.1424 0.4496-9.1424 1.5104-17.1024 6.9792-21.7968 14.8976l-48.0832 81.0224-77.4304-215.1488L617.0784 426.992z"></path>
@@ -560,60 +560,60 @@ function ButtonBox(props: ButtonBoxProps) {
         <path d={deploy.status == "running" ? StopIcon : LaunchIcon}></path>
       </Button>
     </div>
-  );
+  )
 }
 
 interface ModBoxContent {
-  pick: PublishedFileDetail[];
-  search: PublishedFileDetail[];
-  state?: "searching" | "parsing" | undefined;
+  pick: PublishedFileDetail[]
+  search: PublishedFileDetail[]
+  state?: "searching" | "parsing" | undefined
 }
 interface ModProps {
-  mode?: "add";
-  content: ModBoxContent;
-  mod: PublishedFileDetail;
-  setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>;
+  mode?: "add"
+  content: ModBoxContent
+  mod: PublishedFileDetail
+  setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>
 }
 function Mod(props: ModProps) {
-  const { mode, content, mod, setContent } = props;
-  const [adding, setAdding] = useState<boolean>(false);
+  const { mode, content, mod, setContent } = props
+  const [adding, setAdding] = useState<boolean>(false)
   const onDelete = async () => {
     const pick = content.pick.filter(
-      (e) => e.publishedfileid !== mod.publishedfileid
-    );
+      (e) => e.publishedfileid !== mod.publishedfileid,
+    )
     setContent(
       produce((draft) => {
-        draft.pick = pick;
-      })
-    );
-  };
+        draft.pick = pick
+      }),
+    )
+  }
   const onAdd = async () => {
     const search = content.search.filter(
-      (e) => e.publishedfileid !== mod.publishedfileid
-    );
+      (e) => e.publishedfileid !== mod.publishedfileid,
+    )
     const pick = content.pick.filter(
-      (e) => e.publishedfileid !== mod.publishedfileid
-    );
-    setAdding(true);
-    const config = await ModAPI.readConfig([mod.publishedfileid]);
+      (e) => e.publishedfileid !== mod.publishedfileid,
+    )
+    setAdding(true)
+    const config = await ModAPI.readConfig([mod.publishedfileid])
     if (config.length > 0) {
-      const mod_config = config[0];
-      const lua = await factory.createEngine();
-      await lua.doString(mod_config.code);
+      const mod_config = config[0]
+      const lua = await factory.createEngine()
+      await lua.doString(mod_config.code)
       pick.push({
         ...mod,
         code: mod.code,
         configuration_options: lua.global.get("configuration_options"),
-      });
+      })
       setContent(
         produce((draft) => {
-          draft.pick = pick;
-          draft.search = search;
-        })
-      );
+          draft.pick = pick
+          draft.search = search
+        }),
+      )
     }
-    setAdding(false);
-  };
+    setAdding(false)
+  }
   return (
     <div className="mod-item">
       <img src={mod.preview_url} width="2.8rem" height="2.8rem" />
@@ -695,40 +695,40 @@ function Mod(props: ModProps) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 interface SearchModProps {
-  content: ModBoxContent;
-  setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>;
+  content: ModBoxContent
+  setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>
 }
 function SearchMod(props: SearchModProps) {
-  const { content, setContent } = props;
-  const [key, setKey] = useState<string>("");
-  const mods: string[] = [];
-  content.pick.forEach((e) => mods.push(e.publishedfileid));
+  const { content, setContent } = props
+  const [key, setKey] = useState<string>("")
+  const mods: string[] = []
+  content.pick.forEach((e) => mods.push(e.publishedfileid))
   async function handleSearch() {
     if (key === "") {
       setContent(
         produce((draft) => {
-          draft.search = [];
-        })
-      );
+          draft.search = []
+        }),
+      )
     } else {
       setContent(
         produce((draft) => {
-          draft.state = "searching";
-        })
-      );
-      const search = await ModAPI.search(key);
+          draft.state = "searching"
+        }),
+      )
+      const search = await ModAPI.search(key)
       setContent(
         produce((draft) => {
-          draft.state = undefined;
+          draft.state = undefined
           draft.search = search.filter(
-            (item) => !mods.includes(item.publishedfileid)
-          );
-        })
-      );
+            (item) => !mods.includes(item.publishedfileid),
+          )
+        }),
+      )
     }
   }
   return (
@@ -776,69 +776,67 @@ function SearchMod(props: SearchModProps) {
                 content={content}
                 setContent={setContent}
               ></Mod>
-            );
+            )
           })}
         </div>
       )}
     </>
-  );
+  )
 }
 
 interface ModBoxProps {
-  deploy: DeploySchema;
+  deploy: DeploySchema
 }
 function ModBox(props: ModBoxProps) {
-  const { deploy } = props;
+  const { deploy } = props
   const [content, setContent] = useState<ModBoxContent>({
     pick: [],
     search: [],
-  });
+  })
   async function loadData() {
-    const mods: string[] = [];
+    const mods: string[] = []
     if (deploy.cluster.world) {
-      const regex = /workshop-([0-9]+)/g;
-      let match;
+      const regex = /workshop-([0-9]+)/g
+      let match
       while (
         (match = regex.exec(deploy.cluster.world[0].modoverrides)) !== null
       ) {
-        mods.push(match[1]);
+        mods.push(match[1])
       }
     }
     if (mods.length > 0) {
       setContent(
         produce((draft) => {
-          draft.state = "parsing";
-        })
-      );
-      const lua = await factory.createEngine();
-      const pick = await ModAPI.read(mods);
-      const pick_config = await ModAPI.readConfig(mods);
+          draft.state = "parsing"
+        }),
+      )
+      const lua = await factory.createEngine()
+      const pick = await ModAPI.read(mods)
+      const pick_config = await ModAPI.readConfig(mods)
       try {
         for (const item of pick) {
-          const config = pick_config.find((e) => e.id == item.publishedfileid);
+          const config = pick_config.find((e) => e.id == item.publishedfileid)
           if (config) {
-            item.code = config.code;
-            await lua.doString(config.code);
-            item.configuration_options = lua.global.get(
-              "configuration_options"
-            );
+            item.code = config.code
+            await lua.doString(config.code)
+            item.configuration_options = lua.global.get("configuration_options")
           }
         }
       } finally {
-        lua.global.close();
+        lua.global.close()
       }
       setContent(
         produce((draft) => {
-          draft.state = undefined;
-          draft.pick = pick;
-        })
-      );
+          draft.state = undefined
+          draft.pick = pick
+        }),
+      )
     }
   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   return (
     <div className="mod-box">
       <SearchMod content={content} setContent={setContent}></SearchMod>
@@ -884,10 +882,10 @@ function ModBox(props: ModBoxProps) {
                 content={content}
                 setContent={setContent}
               ></Mod>
-            );
+            )
           })
         )}
       </div>
     </div>
-  );
+  )
 }
