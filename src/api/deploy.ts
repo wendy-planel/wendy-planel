@@ -7,16 +7,16 @@ interface readParams {
 async function read(
   params: readParams | undefined = undefined,
 ): Promise<DeploySchema[]> {
-  return await Fetch.get<[DeploySchema]>("/api/deploy", params)
+  return await Fetch.get<[DeploySchema]>("/deploy", params)
 }
 
 async function del(id: number): Promise<number> {
-  return await Fetch.delete<number>(`/api/deploy/${id}`)
+  return await Fetch.delete<number>(`/deploy/${id}`)
 }
 
 async function update(id: number, deploy: DeploySchema): Promise<DeploySchema> {
   return await Fetch.put<DeploySchema>(
-    `/api/deploy/${id}`,
+    `/deploy/${id}`,
     null,
     deploy.cluster,
   )

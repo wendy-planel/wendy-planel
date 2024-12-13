@@ -1,3 +1,5 @@
+const HOST = import.meta.env.VITE_API_HOST
+
 async function get<T>(url: string, params: any = null): Promise<T> {
   let full_url = url
   if (params) {
@@ -14,7 +16,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
     ).toString()
     full_url += queryString
   }
-  const response = await fetch(full_url, { method: "GET" })
+  const response = await fetch(HOST + full_url, { method: "GET" })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
@@ -42,7 +44,7 @@ async function post<T>(
     ).toString()
     full_url += queryString
   }
-  const response = await fetch(full_url, {
+  const response = await fetch(HOST + full_url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
@@ -74,7 +76,7 @@ async function del<T>(
     ).toString()
     full_url += queryString
   }
-  const response = await fetch(full_url, {
+  const response = await fetch(HOST + full_url, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -108,7 +110,7 @@ async function put<T>(
     ).toString()
     full_url += queryString
   }
-  const response = await fetch(full_url, {
+  const response = await fetch(HOST + full_url, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
