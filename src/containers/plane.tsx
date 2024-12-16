@@ -9,14 +9,14 @@ import { Deploy, Mod as ModAPI } from "../api"
 import { isPublicIP, extractFirstValidIP } from "../common/tools"
 import {
   Deploy as DeploySchema,
-  PublishedFileDetail,
+  PublishedFileDetail
 } from "../common/interface"
 import {
   LoadIcon,
   StopIcon,
   CopyIcon,
   LaunchIcon,
-  ClickCopyIcon,
+  ClickCopyIcon
 } from "../common/svg"
 
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
@@ -57,7 +57,7 @@ export function Plane() {
     })
     setDeploy(data)
   }
-  async function handleDelete(id: number) {
+  async function onDelete(id: number) {
     await Deploy.delete(id)
     await loadData()
   }
@@ -71,7 +71,7 @@ export function Plane() {
           <PlaneDeploy
             key={item.id}
             deploy={item}
-            onDelete={handleDelete}
+            onDelete={onDelete}
           ></PlaneDeploy>
         )
       })}
@@ -89,7 +89,7 @@ function PlaneDeploy(props: PlaneDeployProps) {
     cpu: 18.09,
     memory: 40.23,
     read: "2015-01-08T22:57:31.547920715Z",
-    status: deploy.status,
+    status: deploy.status
   }
   return (
     <div className="plane-card">
@@ -98,7 +98,7 @@ function PlaneDeploy(props: PlaneDeployProps) {
         <SystemInfo stats={stats}></SystemInfo>
         <ButtonBox deploy={deploy} onDelete={props.onDelete}></ButtonBox>
       </div>
-      <ModBox deploy={deploy}></ModBox>
+      <ModBox deploy={deploy} setDeploy={setDeploy}></ModBox>
     </div>
   )
 }
@@ -113,72 +113,72 @@ function DeployRoom(props: DeployRoomProps) {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.master_port = parseInt(master_port)
-      }),
+      })
     )
   }
   const handleClusterIniMasterIp = (master_ip: string) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.master_ip = master_ip
-      }),
+      })
     )
   }
   const handleClusterIniMaxPlayers = (max_players: string) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.max_players = parseInt(max_players)
-      }),
+      })
     )
   }
   const handleClusterIniClusterPassword = (cluster_password: string) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.cluster_password = cluster_password
-      }),
+      })
     )
   }
   const handleClusterIniClusterName = (cluster_name: string) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.cluster_name = cluster_name
-      }),
+      })
     )
   }
   const handleClusterIniClusterDescription = (cluster_description: string) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.cluster_description = cluster_description
-      }),
+      })
     )
   }
   const handleClusterToken = (cluster_token: string) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.cluster_token = cluster_token
-      }),
+      })
     )
   }
   const handleClusterIniGameMode = (
-    game_mode: "survival" | "endless" | "wilderness",
+    game_mode: "survival" | "endless" | "wilderness"
   ) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.game_mode = game_mode
-      }),
+      })
     )
   }
   const handleClusterIniPvp = (enable: boolean) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.pvp = enable
-      }),
+      })
     )
   }
   const handleClusterIniVote = (enable: boolean) => {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.vote_enabled = enable
-      }),
+      })
     )
   }
   const [copyPath, setCopyPath] = useState<string>(CopyIcon)
@@ -331,7 +331,7 @@ function DeployRoom(props: DeployRoomProps) {
             style={{
               background: "none",
               border: "none",
-              cursor: "pointer",
+              cursor: "pointer"
             }}
             aria-label="复制"
           >
@@ -451,7 +451,7 @@ function ButtonBox(props: ButtonBoxProps) {
     deleting: false,
     downloading: false,
     deploying: false,
-    executing: false,
+    executing: false
   })
   async function handleShare() {
     let text = ""
@@ -466,18 +466,18 @@ function ButtonBox(props: ButtonBoxProps) {
   async function clickDelete() {
     setStates({
       ...states,
-      deleting: true,
+      deleting: true
     })
     onDelete(deploy.id)
   }
   async function clickDownload() {
     setStates({
       ...states,
-      downloading: true,
+      downloading: true
     })
     try {
       const response = await fetch(`api/cluster/download/${deploy.id}`, {
-        method: "GET",
+        method: "GET"
       })
       if (!response.ok) {
         throw new Error("File download failed")
@@ -492,18 +492,18 @@ function ButtonBox(props: ButtonBoxProps) {
     }
     setStates({
       ...states,
-      downloading: false,
+      downloading: false
     })
   }
   async function clickSave() {
     setStates({
       ...states,
-      deploying: true,
+      deploying: true
     })
     await Deploy.update(deploy.id, deploy)
     setStates({
       ...states,
-      deploying: false,
+      deploying: false
     })
   }
   return (
@@ -568,6 +568,56 @@ interface ModBoxContent {
   search: PublishedFileDetail[]
   state?: "searching" | "parsing" | undefined
 }
+
+function rewriteModoverrides(
+  pick: PublishedFileDetail[],
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
+) {
+  const pick_configuration = []
+  for (const mod of pick) {
+    if (mod.configuration !== undefined) {
+      pick_configuration.push({
+        id: mod.publishedfileid,
+        configuration: mod.configuration
+      })
+    }
+  }
+  let modoverrides = "return {"
+  for (const modconfig of pick_configuration) {
+    modoverrides += `["workshop-${modconfig.id}"]={\n`
+    modoverrides += "configuration_options={\n"
+    const config = modconfig.configuration.configuration_options
+    for (const key in config) {
+      const value = config[key]
+      let luaValue: any = null
+      if (typeof value === "string") {
+        luaValue = `"${value}"`
+      } else if (typeof value === "boolean") {
+        luaValue = value ? "true" : "false"
+      } else if (typeof value === "number") {
+        luaValue = value
+      } else if (Array.isArray(value)) {
+        luaValue = `{${value.join(", ")}}`
+      } else {
+        luaValue = "nil"
+      }
+      modoverrides += `  ${key} = ${luaValue},\n`
+    }
+    modoverrides += "},\n"
+    modoverrides += "enabled=true"
+    modoverrides += "},\n"
+  }
+  modoverrides += "}"
+  console.log(modoverrides)
+  setDeploy(
+    produce((draft) => {
+      for (const world of draft.cluster.world) {
+        world.modoverrides = modoverrides
+      }
+    })
+  )
+}
+
 interface ModProps {
   mode?: "add"
   content: ModBoxContent
@@ -579,20 +629,20 @@ function Mod(props: ModProps) {
   const [adding, setAdding] = useState<boolean>(false)
   const onDelete = async () => {
     const pick = content.pick.filter(
-      (e) => e.publishedfileid !== mod.publishedfileid,
+      (e) => e.publishedfileid !== mod.publishedfileid
     )
     setContent(
       produce((draft) => {
         draft.pick = pick
-      }),
+      })
     )
   }
   const onAdd = async () => {
     const search = content.search.filter(
-      (e) => e.publishedfileid !== mod.publishedfileid,
+      (e) => e.publishedfileid !== mod.publishedfileid
     )
     const pick = content.pick.filter(
-      (e) => e.publishedfileid !== mod.publishedfileid,
+      (e) => e.publishedfileid !== mod.publishedfileid
     )
     setAdding(true)
     const config = await ModAPI.readConfig([mod.publishedfileid])
@@ -603,13 +653,13 @@ function Mod(props: ModProps) {
       pick.push({
         ...mod,
         code: mod.code,
-        configuration_options: lua.global.get("configuration_options"),
+        configuration_options: lua.global.get("configuration_options")
       })
       setContent(
         produce((draft) => {
           draft.pick = pick
           draft.search = search
-        }),
+        })
       )
     }
     setAdding(false)
@@ -712,22 +762,22 @@ function SearchMod(props: SearchModProps) {
       setContent(
         produce((draft) => {
           draft.search = []
-        }),
+        })
       )
     } else {
       setContent(
         produce((draft) => {
           draft.state = "searching"
-        }),
+        })
       )
       const search = await ModAPI.search(key)
       setContent(
         produce((draft) => {
           draft.state = undefined
           draft.search = search.filter(
-            (item) => !mods.includes(item.publishedfileid),
+            (item) => !mods.includes(item.publishedfileid)
           )
-        }),
+        })
       )
     }
   }
@@ -786,12 +836,13 @@ function SearchMod(props: SearchModProps) {
 
 interface ModBoxProps {
   deploy: DeploySchema
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 function ModBox(props: ModBoxProps) {
-  const { deploy } = props
+  const { deploy, setDeploy } = props
   const [content, setContent] = useState<ModBoxContent>({
     pick: [],
-    search: [],
+    search: []
   })
   async function loadData() {
     const mods: string[] = []
@@ -808,9 +859,11 @@ function ModBox(props: ModBoxProps) {
       setContent(
         produce((draft) => {
           draft.state = "parsing"
-        }),
+        })
       )
       const lua = await factory.createEngine()
+      const modoverrides = deploy.cluster.world[0].modoverrides
+      const modconfig = await lua.doString(modoverrides)
       const pick = await ModAPI.read(mods)
       const pick_config = await ModAPI.readConfig(mods)
       try {
@@ -820,6 +873,7 @@ function ModBox(props: ModBoxProps) {
             item.code = config.code
             await lua.doString(config.code)
             item.configuration_options = lua.global.get("configuration_options")
+            item.configuration = modconfig[`workshop-${item.publishedfileid}`]
           }
         }
       } finally {
@@ -829,7 +883,7 @@ function ModBox(props: ModBoxProps) {
         produce((draft) => {
           draft.state = undefined
           draft.pick = pick
-        }),
+        })
       )
     }
   }
@@ -837,6 +891,10 @@ function ModBox(props: ModBoxProps) {
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    rewriteModoverrides(content.pick, setDeploy)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content.pick])
   return (
     <div className="mod-box">
       <SearchMod content={content} setContent={setContent}></SearchMod>
@@ -847,7 +905,7 @@ function ModBox(props: ModBoxProps) {
           height:
             content.search.length <= 0 && content.state !== "searching"
               ? "78%"
-              : "45%",
+              : "45%"
         }}
       >
         {content.state === "parsing" ? (

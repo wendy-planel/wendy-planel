@@ -14,5 +14,5 @@ createRoot(document.getElementById("root")!).render(
         <Plane></Plane>
       </div>
     </div>
-  </StrictMode>,
+  </StrictMode>
 )

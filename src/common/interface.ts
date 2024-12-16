@@ -52,6 +52,11 @@ export interface Tag {
   tag: string
 }
 
+export interface Configuration {
+  enabled: boolean
+  configuration_options: Record<string, any>
+}
+
 export interface PublishedFileDetail {
   publishedfileid: string
   result: number
@@ -79,6 +84,7 @@ export interface PublishedFileDetail {
   tags: Tag[]
   code?: string
   configuration_options?: object
+  configuration?: Configuration
 }
 
 export interface ModInfo {

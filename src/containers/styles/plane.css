@@ -308,3 +308,14 @@ input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
 }
+
+.mod-config {
+  position: fixed;
+  z-index: 100;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #0000;
+  width: 20rem;
+  height: 20rem;
+}

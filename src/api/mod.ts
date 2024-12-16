@@ -13,7 +13,7 @@ async function read(mods: string[]): Promise<PublishedFileDetail[]> {
   const detail = await Fetch.post<PublishedFileDetailResponse>(
     "/mod/publishedfiledetails",
     null,
-    mods,
+    mods
   )
   return detail.response.publishedfiledetails
 }
@@ -23,8 +23,8 @@ async function search(search_text: string): Promise<PublishedFileDetail[]> {
     "/mod/search",
     null,
     {
-      search_text: search_text,
-    },
+      search_text: search_text
+    }
   )
   return detail.response.publishedfiledetails
 }
@@ -36,5 +36,5 @@ async function readConfig(mods: string[]) {
 export const Mod = {
   read: read,
   search: search,
-  readConfig: readConfig,
+  readConfig: readConfig
 }

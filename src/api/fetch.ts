@@ -11,8 +11,8 @@ async function get<T>(url: string, params: any = null): Promise<T> {
           }
           return acc
         },
-        {} as { [key: string]: string },
-      ),
+        {} as { [key: string]: string }
+      )
     ).toString()
     full_url += queryString
   }
@@ -27,7 +27,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
 async function post<T>(
   url: string,
   params: any = null,
-  body: any = null,
+  body: any = null
 ): Promise<T> {
   let full_url = url
   if (params) {
@@ -39,8 +39,8 @@ async function post<T>(
           }
           return acc
         },
-        {} as { [key: string]: string },
-      ),
+        {} as { [key: string]: string }
+      )
     ).toString()
     full_url += queryString
   }
@@ -48,7 +48,7 @@ async function post<T>(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body instanceof FormData ? body : body ? JSON.stringify(body) : null,
-    mode: "cors",
+    mode: "cors"
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
@@ -60,7 +60,7 @@ async function post<T>(
 async function del<T>(
   url: string,
   params: any = null,
-  body: any = null,
+  body: any = null
 ): Promise<T> {
   let full_url = url
   if (params) {
@@ -72,18 +72,18 @@ async function del<T>(
           }
           return acc
         },
-        {} as { [key: string]: string },
-      ),
+        {} as { [key: string]: string }
+      )
     ).toString()
     full_url += queryString
   }
   const response = await fetch(HOST + full_url, {
     method: "DELETE",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: body ? JSON.stringify(body) : null,
-    mode: "cors",
+    mode: "cors"
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
@@ -95,7 +95,7 @@ async function del<T>(
 async function put<T>(
   url: string,
   params: any = null,
-  body: any = null,
+  body: any = null
 ): Promise<T> {
   let full_url = url
   if (params) {
@@ -107,18 +107,18 @@ async function put<T>(
           }
           return acc
         },
-        {} as { [key: string]: string },
-      ),
+        {} as { [key: string]: string }
+      )
     ).toString()
     full_url += queryString
   }
   const response = await fetch(HOST + full_url, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: body ? JSON.stringify(body) : null,
-    mode: "cors",
+    mode: "cors"
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
@@ -131,5 +131,5 @@ export const Fetch = {
   get: get,
   post: post,
   delete: del,
-  put: put,
+  put: put
 }

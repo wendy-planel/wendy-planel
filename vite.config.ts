@@ -4,6 +4,6 @@ import react from "@vitejs/plugin-react"
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), wasm()],
+    plugins: [react(), wasm()]
   }
 })

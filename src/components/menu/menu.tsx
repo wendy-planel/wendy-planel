@@ -13,7 +13,7 @@ export function LeftMenu(props: LeftMenuProps) {
   const handleChildOnClick = (
     index: number,
     event: React.MouseEvent<HTMLDivElement>,
-    childOnClick?: React.MouseEventHandler<HTMLDivElement>,
+    childOnClick?: React.MouseEventHandler<HTMLDivElement>
   ) => {
     // 点击时候选择，并且触发点击事件
     setSelected(index)
@@ -29,7 +29,7 @@ export function LeftMenu(props: LeftMenuProps) {
             index: index,
             current: selected,
             onClick: (event: React.MouseEvent<HTMLDivElement>) =>
-              handleChildOnClick(index, event, child.props.onClick),
+              handleChildOnClick(index, event, child.props.onClick)
           }
           return React.cloneElement(child, childProps)
         }
