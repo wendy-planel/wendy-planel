@@ -6,7 +6,9 @@ export function LeftNav() {
   return (
     <LeftMenu current={2}>
       <div className="left-nav-title">温蒂面板</div>
-      <img className="left-nav-avatar" src="/assets/images/wendy.png"></img>
+      <div className="left-nav-avatar">
+        <img src="/assets/images/wendy.png"></img>
+      </div>
       <MenuItem>
         <div>
           <img
