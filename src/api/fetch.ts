@@ -24,11 +24,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
   return data as T
 }
 
-async function post<T>(
-  url: string,
-  params: any = null,
-  body: any = null
-): Promise<T> {
+async function post<T>(url: string, params: any = null, body: any = null): Promise<T> {
   let full_url = url
   if (params) {
     const queryString = new URLSearchParams(
@@ -57,11 +53,7 @@ async function post<T>(
   return data as T
 }
 
-async function del<T>(
-  url: string,
-  params: any = null,
-  body: any = null
-): Promise<T> {
+async function del<T>(url: string, params: any = null, body: any = null): Promise<T> {
   let full_url = url
   if (params) {
     const queryString = new URLSearchParams(
@@ -92,11 +84,7 @@ async function del<T>(
   return data as T
 }
 
-async function put<T>(
-  url: string,
-  params: any = null,
-  body: any = null
-): Promise<T> {
+async function put<T>(url: string, params: any = null, body: any = null): Promise<T> {
   let full_url = url
   if (params) {
     const queryString = new URLSearchParams(

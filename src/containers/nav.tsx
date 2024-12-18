@@ -11,19 +11,13 @@ export function LeftNav() {
       </div>
       <MenuItem>
         <div>
-          <img
-            className="left-nav-icon"
-            src="/assets/images/flysheet.png"
-          ></img>
+          <img className="left-nav-icon" src="/assets/images/flysheet.png"></img>
           <div>面板信息</div>
         </div>
       </MenuItem>
       <MenuItem>
         <div>
-          <img
-            className="left-nav-icon"
-            src="/assets/images/portabletent.png"
-          ></img>
+          <img className="left-nav-icon" src="/assets/images/portabletent.png"></img>
           <div>大厅查询</div>
         </div>
       </MenuItem>

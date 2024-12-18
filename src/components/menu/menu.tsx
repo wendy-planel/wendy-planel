@@ -28,8 +28,7 @@ export function LeftMenu(props: LeftMenuProps) {
           const childProps = {
             index: index,
             current: selected,
-            onClick: (event: React.MouseEvent<HTMLDivElement>) =>
-              handleChildOnClick(index, event, child.props.onClick)
+            onClick: (event: React.MouseEvent<HTMLDivElement>) => handleChildOnClick(index, event, child.props.onClick)
           }
           return React.cloneElement(child, childProps)
         }
@@ -48,13 +47,8 @@ interface MenuItemProps {
 }
 export function MenuItem(props: MenuItemProps) {
   const { index, current, className, children = "", onClick } = props
-  const innerClassName =
-    index != undefined && index == current
-      ? "menu-item menu-item-selected"
-      : "menu-item"
-  const mergeClassName = className
-    ? className + " " + innerClassName
-    : innerClassName
+  const innerClassName = index != undefined && index == current ? "menu-item menu-item-selected" : "menu-item"
+  const mergeClassName = className ? className + " " + innerClassName : innerClassName
   return (
     <div className={mergeClassName} onClick={onClick}>
       <div>{children}</div>

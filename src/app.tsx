@@ -7,7 +7,7 @@ import { Plane } from "./containers/plane"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <div className="box">
+    <div id="app" className="box">
       <LeftNav></LeftNav>
       <div>
         <TopNav></TopNav>

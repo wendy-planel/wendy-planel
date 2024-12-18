@@ -57,6 +57,20 @@ export interface Configuration {
   configuration_options: Record<string, any>
 }
 
+interface Option {
+  data: any
+  description: string
+}
+
+export interface ConfigurationOption {
+  options: Option[]
+  label: string
+  default: any
+  selected?: number
+  hover: string
+  name: string
+}
+
 export interface PublishedFileDetail {
   publishedfileid: string
   result: number
@@ -83,7 +97,7 @@ export interface PublishedFileDetail {
   views: number
   tags: Tag[]
   code?: string
-  configuration_options?: object
+  configuration_options?: ConfigurationOption[]
   configuration?: Configuration
 }
 

@@ -12,11 +12,7 @@ export const HoverTip = (props: HoverTipProps) => {
   const showTip = useCallback(() => setVisible(true), [])
   const hideTip = useCallback(() => setVisible(false), [])
   return (
-    <div
-      className="hovertip-container"
-      onMouseEnter={showTip}
-      onMouseLeave={hideTip}
-    >
+    <div className="hovertip-container" onMouseEnter={showTip} onMouseLeave={hideTip}>
       {children}
       <div className={`hovertip ${visible ? "visible" : ""}`}>{tip}</div>
     </div>

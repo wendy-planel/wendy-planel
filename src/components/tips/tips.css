@@ -14,11 +14,11 @@
   border-radius: 2%;
   white-space: nowrap;
   z-index: 1000;
-  opacity: 0; /* 初始状态隐藏 */
-  visibility: hidden; /* 初始状态隐藏 */
+  opacity: 0;
+  visibility: hidden;
   transition:
     opacity 0.3s ease,
-    visibility 0.3s ease; /* 添加过渡效果 */
+    visibility 0.3s ease;
 }
 
 .hovertip::after {
@@ -33,6 +33,6 @@
 }
 
 .hovertip-container:hover .hovertip {
-  opacity: 0.75; /* 鼠标悬停时显示 */
-  visibility: visible; /* 鼠标悬停时显示 */
+  opacity: 0.75;
+  visibility: visible;
 }

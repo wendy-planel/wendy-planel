@@ -1,9 +1,6 @@
 export function isPublicIP(ip: string): boolean {
   const parts = ip.split(".").map(Number)
-  if (
-    parts.length !== 4 ||
-    parts.some((part) => isNaN(part) || part < 0 || part > 255)
-  ) {
+  if (parts.length !== 4 || parts.some((part) => isNaN(part) || part < 0 || part > 255)) {
     return false
   }
   return (
