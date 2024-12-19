@@ -18,7 +18,7 @@ export interface DeployClusterIni {
   cluster_key: string
 }
 
-interface DeployClusterWorld {
+export interface DeployClusterWorld {
   id: string
   name: string
   leveldataoverride: string

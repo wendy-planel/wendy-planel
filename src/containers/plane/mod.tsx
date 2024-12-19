@@ -55,7 +55,6 @@ function rewriteModoverrides(
     modoverrides += "},\n"
   }
   modoverrides += "}"
-  console.log(modoverrides)
   setDeploy(
     produce((draft) => {
       for (const world of draft.cluster.world) {

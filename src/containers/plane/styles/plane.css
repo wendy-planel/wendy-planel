@@ -360,6 +360,7 @@ input::-webkit-inner-spin-button {
   flex-direction: row;
   align-items: center;
   background-color: #0000;
+  padding-bottom: 0.2rem;
 }
 
 .mod-config-label {
