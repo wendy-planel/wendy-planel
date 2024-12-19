@@ -2,8 +2,8 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
 import "./app.css"
-import { LeftNav, TopNav } from "./containers/nav"
 import { Plane } from "./containers/plane"
+import { LeftNav, TopNav } from "./containers/nav"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
