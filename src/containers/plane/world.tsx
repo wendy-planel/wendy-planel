@@ -26,6 +26,7 @@ interface WorldCardProps {
 }
 function WorldCard(props: WorldCardProps) {
   const { world, setDeploy } = props
+  console.log(setDeploy)
   useEffect(() => {
     const parseLeveldataoverride = async () => {
       const lua = await factory.createEngine()
