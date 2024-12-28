@@ -331,7 +331,7 @@ function SearchMod(props: SearchModProps) {
           onChange={(e) => setKey(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         ></input>
-        <div onClick={handleSearch}>
+        <div onClick={handleSearch} style={{ marginRight: "0.5rem", display: "flex", alignItems: "center" }}>
           <svg viewBox="0 0 1024 1024" width="24" height="24" fill="#3498db">
             <path d="M480 128a352 352 0 0 1 270.528 577.28l138.24 138.24c10.752 10.496 9.28 29.312-3.2 42.112-12.8 12.48-31.616 13.888-42.048 3.136l-138.24-138.24A352 352 0 1 1 480 128z m0 63.36c-182.72 0-288.128 147.2-288.128 288.64s105.088 289.28 288 289.28c182.848 0 288-147.84 288-289.28 0-141.44-105.152-288.64-287.872-288.64z"></path>
           </svg>
