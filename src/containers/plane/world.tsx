@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react"
+import { produce } from "immer"
 import { LuaFactory } from "wasmoon"
+import { useEffect, useState } from "react"
 
 import "./styles/plane.css"
 import { Deploy as DeploySchema, DeployClusterWorld } from "../../common/interface"
@@ -7,11 +8,6 @@ import { CavesLeveldataoverrideDefault, MasterLeveldataoverrideDefault } from ".
 
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
 
-interface World {
-  index: number
-  name: string
-  type: "Master" | "Caves"
-}
 interface WorldProps {
   deploy: DeploySchema
   setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
@@ -19,25 +15,28 @@ interface WorldProps {
 export function World(props: WorldProps) {
   const { deploy, setDeploy } = props
   const [seleted, setSeleted] = useState<number>(0)
-  const world: World[] = deploy.cluster.world.map(function (item, index) {
-    return { index: index, type: item.type, name: item.type === "Master" ? "森林" : "洞穴" }
-  })
   return (
     <div className="world-box">
-      <TopNav seleted={seleted} world={world} setSeleted={setSeleted}></TopNav>
+      <TopNav seleted={seleted} world={deploy.cluster.world} setSeleted={setSeleted} setDeploy={setDeploy}></TopNav>
       <div>
-        <WorldCard
-          key={seleted}
-          seleted={seleted}
-          world={deploy.cluster.world[seleted]}
-          setDeploy={props.setDeploy}
-        ></WorldCard>
+        {deploy.cluster.world.length > 0 && (
+          <WorldCard
+            key={seleted}
+            seleted={seleted}
+            world={deploy.cluster.world[seleted]}
+            setDeploy={props.setDeploy}
+          ></WorldCard>
+        )}
       </div>
     </div>
   )
 }
 
-function addWorld(type: "Master" | "Caves", world: DeployClusterWorld[]) {
+function addWorld(
+  type: "Master" | "Caves",
+  world: DeployClusterWorld[],
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
+) {
   let is_master = type === "Master"
   let modoverrides = "return {  }"
   let docker_api = "unix:///var/run/docker.sock"
@@ -68,16 +67,36 @@ function addWorld(type: "Master" | "Caves", world: DeployClusterWorld[]) {
     docker_api: docker_api,
     container: ""
   })
+  setDeploy(
+    produce((draft) => {
+      draft.cluster.world = ret
+    })
+  )
+}
+
+function removeWorld(
+  seleted: number,
+  world: DeployClusterWorld[],
+  setSeleted: React.Dispatch<React.SetStateAction<number>>,
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
+) {
+  setDeploy(
+    produce((draft) => {
+      draft.cluster.world = [...world.slice(0, seleted), ...world.slice(seleted + 1)]
+    })
+  )
+  setSeleted(0)
 }
 
 interface TopNavProps {
   seleted: number
-  world: World[]
+  world: DeployClusterWorld[]
   setSeleted: React.Dispatch<React.SetStateAction<number>>
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 function TopNav(props: TopNavProps) {
   const [show, setShow] = useState<boolean>(false)
-  const { seleted, world, setSeleted } = props
+  const { seleted, world, setSeleted, setDeploy } = props
   return (
     <div className="world-nav" onMouseLeave={() => setShow(false)}>
       {world.map(function (item, index) {
@@ -88,7 +107,7 @@ function TopNav(props: TopNavProps) {
             onClick={() => setSeleted(index)}
             style={{ color: seleted === index ? "#fff" : "#666" }}
           >
-            {item.name}
+            {item.type === "Master" ? "森林" : "洞穴"}
           </div>
         )
       })}
@@ -98,10 +117,23 @@ function TopNav(props: TopNavProps) {
         </svg>
         {show && (
           <div className="world-nav-add-box">
-            <div className="world-nav-add-button">森林</div>
-            <div className="world-nav-add-button">洞穴</div>
+            <div className="world-nav-add-button" onClick={() => addWorld("Master", world, setDeploy)}>
+              森林
+            </div>
+            <div className="world-nav-add-button" onClick={() => addWorld("Caves", world, setDeploy)}>
+              洞穴
+            </div>
           </div>
         )}
+      </div>
+      <div
+        className="world-nav-remove"
+        onMouseEnter={() => setShow(false)}
+        onClick={() => removeWorld(seleted, world, setSeleted, setDeploy)}
+      >
+        <svg viewBox="0 0 1024 1024" width="18" height="18" fill="#3498db" transform="scale(1.35)">
+          <path d="M512 146.286a365.714 365.714 0 1 1 0 731.428 365.714 365.714 0 0 1 0-731.428z m0 62.025a303.69 303.69 0 1 0 0.073 607.451A303.69 303.69 0 0 0 512 208.311zM647.022 376.32a6.555 6.555 0 0 1 6.583 6.583 6.583 6.583 0 0 1-1.463 4.169L545.865 513.609l106.057 126.537a6.802 6.802 0 0 1 1.536 4.17 6.555 6.555 0 0 1-6.583 6.582l-53.833-0.292L512 553.984l-81.042 96.695-53.98 0.292a6.583 6.583 0 0 1-4.973-10.825l106.203-126.464-106.203-126.537a6.802 6.802 0 0 1-1.536-4.242 6.477 6.477 0 0 1 6.51-6.51l53.979 0.293L512 473.234l81.189-96.768z"></path>
+        </svg>
       </div>
     </div>
   )
@@ -113,8 +145,7 @@ interface WorldCardProps {
   setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 function WorldCard(props: WorldCardProps) {
-  const { world, setDeploy } = props
-  console.log(setDeploy)
+  const { seleted, world, setDeploy } = props
   useEffect(() => {
     const parseLeveldataoverride = async () => {
       const lua = await factory.createEngine()
@@ -124,5 +155,20 @@ function WorldCard(props: WorldCardProps) {
     parseLeveldataoverride()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  return <div></div>
+  const updateDockerApi = (docker_api: string) => {
+    setDeploy(
+      produce((draft) => {
+        draft.cluster.world[seleted].docker_api = docker_api
+      })
+    )
+  }
+  return (
+    <div>
+      <div className="plane-card-line">
+        docker:
+        <input name="docker_api" value={world.docker_api} onChange={(e) => updateDockerApi(e.target.value)} />
+      </div>
+      <div>// 世界配置</div>
+    </div>
+  )
 }
