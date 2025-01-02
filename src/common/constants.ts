@@ -1,4 +1,4 @@
-export const WorldOptions = {
+export const WorldOverrides = {
   forest: [
     {
       name: "beefalo",
@@ -7799,7 +7799,7 @@ export const WorldOptions = {
   ]
 }
 
-export const CavesLeveldataoverrideDefault = `return {
+export const CavesDefault = `return {
   background_node_range={ 0, 1 },
   desc="探查洞穴…… 一起！",
   hideminimap=false,
@@ -7932,7 +7932,7 @@ export const CavesLeveldataoverrideDefault = `return {
 }
 `
 
-export const MasterLeveldataoverrideDefault = `return {
+export const MasterDefault = `return {
   desc="永不结束的饥荒沙盒模式。\
 永远可以在绚丽之门复活。",
   hideminimap=false,

@@ -1,10 +1,11 @@
 import { produce } from "immer"
 import { LuaFactory } from "wasmoon"
 import { useEffect, useState } from "react"
+import { FixedSizeList } from "react-window"
 
 import "./styles/plane.css"
 import { Deploy as DeploySchema, DeployClusterWorld } from "../../common/interface"
-import { CavesLeveldataoverrideDefault, MasterLeveldataoverrideDefault } from "../../common/constants"
+import { CavesDefault, MasterDefault, WorldOverrides } from "../../common/constants"
 
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
 
@@ -40,7 +41,7 @@ function addWorld(
   let is_master = type === "Master"
   let modoverrides = "return {  }"
   let docker_api = "unix:///var/run/docker.sock"
-  let leveldataoverride = type === "Master" ? MasterLeveldataoverrideDefault : CavesLeveldataoverrideDefault
+  let leveldataoverride = type === "Master" ? CavesDefault : MasterDefault
   for (const item of world) {
     if (item.is_master) {
       is_master = false
@@ -139,6 +140,19 @@ function TopNav(props: TopNavProps) {
   )
 }
 
+interface Option {
+  name: string
+  description: string
+}
+interface Override {
+  name: string
+  text: string
+  group: string
+  selected: number
+  options: Option[]
+  order: number
+  image: string
+}
 interface WorldCardProps {
   seleted: number
   world: DeployClusterWorld
@@ -146,11 +160,25 @@ interface WorldCardProps {
 }
 function WorldCard(props: WorldCardProps) {
   const { seleted, world, setDeploy } = props
+  const [overrides, setOverrides] = useState<Override[]>([])
   useEffect(() => {
     const parseLeveldataoverride = async () => {
       const lua = await factory.createEngine()
       const leveldataoverride = await lua.doString(world.leveldataoverride)
-      console.log(leveldataoverride)
+      const _overrides = world.type === "Master" ? [...WorldOverrides.forest] : [...WorldOverrides.cave]
+      _overrides?.forEach((item) => {
+        const value = leveldataoverride[item.name]
+        let selected = item.selected
+        for (let i = 0; i < item.options.length; i++) {
+          if (item.options[i].name === value) {
+            selected = i
+            break
+          }
+        }
+        item.selected = selected
+        return item
+      })
+      setOverrides(_overrides)
     }
     parseLeveldataoverride()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,13 +190,37 @@ function WorldCard(props: WorldCardProps) {
       })
     )
   }
+
+  const renderItem = ({ index }: { index: number}) => {
+    const item = overrides[index]
+    return (
+      <div key={index} className="overrides">
+        <img src={`/assets/images/${item.image}`}/>
+        <div>
+          <svg viewBox="0 0 1024 1024" width="20" height="20" fill="#3498db">
+            <path d="M734.165333 97.834667a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010666L380.416 512l353.749333 353.749333a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010667a42.666667 42.666667 0 0 1-56.32 3.584l-4.010666-3.541333-384-384a42.666667 42.666667 0 0 1-3.541334-56.32l3.541334-3.968 384-384a42.666667 42.666667 0 0 1 60.330666 0z"></path>
+          </svg>
+        </div>
+        <div>{item.text}</div>
+        <div>{item.options[item.selected].description}</div>
+        <div>
+          <svg viewBox="0 0 1024 1024" width="20" height="20" fill="#3498db">
+            <path d="M311.168 97.834667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666L664.917333 512 311.168 865.706667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666a42.666667 42.666667 0 0 0 56.32 3.584l4.010667-3.541333 384-384a42.666667 42.666667 0 0 0 3.541333-56.32l-3.541333-3.968-384-384a42.666667 42.666667 0 0 0-60.330667 0z"></path>
+          </svg>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="plane-card-line">
         docker:
         <input name="docker_api" value={world.docker_api} onChange={(e) => updateDockerApi(e.target.value)} />
       </div>
-      <div>// 世界配置</div>
+      <FixedSizeList height={400} itemCount={overrides.length} itemSize={20} width={300}>
+        {renderItem}
+      </FixedSizeList>
     </div>
   )
 }

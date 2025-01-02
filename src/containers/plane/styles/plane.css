@@ -236,9 +236,8 @@ input::-webkit-inner-spin-button {
   overflow-y: auto;
 }
 
-/* 自定义滚动条样式 */
 .mod-box-added::-webkit-scrollbar {
-  width: 0.8rem; /* 滚动条宽度 */
+  width: 0.8rem;
 }
 
 .mod-box-added::-webkit-scrollbar-track {
@@ -463,4 +462,15 @@ input::-webkit-inner-spin-button {
   width: 2.5rem;
   border-radius: 0.2rem;
   cursor: pointer;
+}
+
+.overrides {
+  height: 3rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.overrides img {
+  width: 2.8rem;
+  height: 2.8rem;
 }
