@@ -35,4 +35,5 @@
 .hovertip-container:hover .hovertip {
   opacity: 0.75;
   visibility: visible;
+  transition-delay: 0.5s;
 }

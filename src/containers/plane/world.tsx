@@ -1,9 +1,9 @@
 import { produce } from "immer"
 import { LuaFactory } from "wasmoon"
 import { useEffect, useState } from "react"
-import { FixedSizeList } from "react-window"
 
 import "./styles/plane.css"
+import { HoverTip } from "../../components/tips"
 import { Deploy as DeploySchema, DeployClusterWorld } from "../../common/interface"
 import { CavesDefault, MasterDefault, WorldOverrides } from "../../common/constants"
 
@@ -190,37 +190,52 @@ function WorldCard(props: WorldCardProps) {
       })
     )
   }
-
-  const renderItem = ({ index }: { index: number}) => {
-    const item = overrides[index]
-    return (
-      <div key={index} className="overrides">
-        <img src={`/assets/images/${item.image}`}/>
-        <div>
-          <svg viewBox="0 0 1024 1024" width="20" height="20" fill="#3498db">
-            <path d="M734.165333 97.834667a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010666L380.416 512l353.749333 353.749333a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010667a42.666667 42.666667 0 0 1-56.32 3.584l-4.010666-3.541333-384-384a42.666667 42.666667 0 0 1-3.541334-56.32l3.541334-3.968 384-384a42.666667 42.666667 0 0 1 60.330666 0z"></path>
-          </svg>
+  const rows = () => {
+    let i = 0
+    const items = []
+    while (i < overrides.length) {
+      const line = []
+      for (let j = 0; j < 3 && i + j < overrides.length; j++) {
+        const index = i + j
+        const item = overrides[index]
+        line.push(
+          <div key={index} className="overrides">
+            <img src={`/assets/images/${item.image}`} />
+            <div>
+              <svg viewBox="0 0 1024 1024" width="24" height="24" fill="#3498db">
+                <path d="M734.165333 97.834667a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010666L380.416 512l353.749333 353.749333a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010667a42.666667 42.666667 0 0 1-56.32 3.584l-4.010666-3.541333-384-384a42.666667 42.666667 0 0 1-3.541334-56.32l3.541334-3.968 384-384a42.666667 42.666667 0 0 1 60.330666 0z"></path>
+              </svg>
+            </div>
+            <HoverTip tip={item.text}>
+              <div className="override-text">
+                <div>{item.text}</div>
+                <div className="override-value">{item.options[item.selected].description}</div>
+              </div>
+            </HoverTip>
+            <div>
+              <svg viewBox="0 0 1024 1024" width="24" height="24" fill="#3498db">
+                <path d="M311.168 97.834667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666L664.917333 512 311.168 865.706667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666a42.666667 42.666667 0 0 0 56.32 3.584l4.010667-3.541333 384-384a42.666667 42.666667 0 0 0 3.541333-56.32l-3.541333-3.968-384-384a42.666667 42.666667 0 0 0-60.330667 0z"></path>
+              </svg>
+            </div>
+          </div>
+        )
+      }
+      items.push(
+        <div key={i} className="overrides-row">
+          {line}
         </div>
-        <div>{item.text}</div>
-        <div>{item.options[item.selected].description}</div>
-        <div>
-          <svg viewBox="0 0 1024 1024" width="20" height="20" fill="#3498db">
-            <path d="M311.168 97.834667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666L664.917333 512 311.168 865.706667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666a42.666667 42.666667 0 0 0 56.32 3.584l4.010667-3.541333 384-384a42.666667 42.666667 0 0 0 3.541333-56.32l-3.541333-3.968-384-384a42.666667 42.666667 0 0 0-60.330667 0z"></path>
-          </svg>
-        </div>
-      </div>
-    )
+      )
+      i += 3
+    }
+    return items
   }
-
   return (
     <div>
       <div className="plane-card-line">
         docker:
         <input name="docker_api" value={world.docker_api} onChange={(e) => updateDockerApi(e.target.value)} />
       </div>
-      <FixedSizeList height={400} itemCount={overrides.length} itemSize={20} width={300}>
-        {renderItem}
-      </FixedSizeList>
+      <div className="overrides-box">{rows()}</div>
     </div>
   )
 }
