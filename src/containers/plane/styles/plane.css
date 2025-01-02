@@ -176,7 +176,7 @@ input::-webkit-inner-spin-button {
 .mod-box {
   font-size: 0.8rem;
   margin-top: 1rem;
-  width: 12rem;
+  min-width: 12rem;
   display: flex;
   height: 100%;
   flex-direction: column;
