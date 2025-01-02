@@ -167,7 +167,7 @@ function WorldCard(props: WorldCardProps) {
       const leveldataoverride = await lua.doString(world.leveldataoverride)
       const _overrides = world.type === "Master" ? [...WorldOverrides.forest] : [...WorldOverrides.cave]
       _overrides?.forEach((item) => {
-        const value = leveldataoverride[item.name]
+        const value = leveldataoverride.overrides[item.name]
         let selected = item.selected
         for (let i = 0; i < item.options.length; i++) {
           if (item.options[i].name === value) {
