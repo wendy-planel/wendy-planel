@@ -36,6 +36,7 @@ export function World(props: WorldProps) {
 function addWorld(
   type: "Master" | "Caves",
   world: DeployClusterWorld[],
+  setSeleted: React.Dispatch<React.SetStateAction<number>>,
   setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 ) {
   let is_master = type === "Master"
@@ -73,6 +74,7 @@ function addWorld(
       draft.cluster.world = ret
     })
   )
+  setSeleted(ret.length - 1)
 }
 
 function removeWorld(
@@ -118,10 +120,10 @@ function TopNav(props: TopNavProps) {
         </svg>
         {show && (
           <div className="world-nav-add-box">
-            <div className="world-nav-add-button" onClick={() => addWorld("Master", world, setDeploy)}>
+            <div className="world-nav-add-button" onClick={() => addWorld("Master", world, setSeleted, setDeploy)}>
               森林
             </div>
-            <div className="world-nav-add-button" onClick={() => addWorld("Caves", world, setDeploy)}>
+            <div className="world-nav-add-button" onClick={() => addWorld("Caves", world, setSeleted, setDeploy)}>
               洞穴
             </div>
           </div>
@@ -175,8 +177,7 @@ function WorldCard(props: WorldCardProps) {
             break
           }
         }
-        item.selected = selected
-        return item
+        return {...item, selected: selected}
       })
       setOverrides(_overrides)
     }
@@ -187,6 +188,23 @@ function WorldCard(props: WorldCardProps) {
     setDeploy(
       produce((draft) => {
         draft.cluster.world[seleted].docker_api = docker_api
+      })
+    )
+  }
+  const updateOverrides = (offset: number, override_index: number, world_index: number) => {
+    const item = overrides[override_index]
+    const old_selected = item.selected
+    const selected = (item.selected + offset + item.options.length) % item.options.length
+    setOverrides(
+      produce((draft) => {
+        draft[override_index].selected = selected
+      })
+    )
+    const old_value = `${item.name}="${item.options[old_selected].name}"`
+    const value = `${item.name}="${item.options[selected].name}"`
+    setDeploy(
+      produce((draft) => {
+        draft.cluster.world[world_index].leveldataoverride = draft.cluster.world[world_index].leveldataoverride.replace(old_value, value)
       })
     )
   }
@@ -201,21 +219,17 @@ function WorldCard(props: WorldCardProps) {
         line.push(
           <div key={index} className="overrides">
             <img src={`/assets/images/${item.image}`} />
-            <div>
-              <svg viewBox="0 0 1024 1024" width="24" height="24" fill="#3498db">
-                <path d="M734.165333 97.834667a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010666L380.416 512l353.749333 353.749333a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010667a42.666667 42.666667 0 0 1-56.32 3.584l-4.010666-3.541333-384-384a42.666667 42.666667 0 0 1-3.541334-56.32l3.541334-3.968 384-384a42.666667 42.666667 0 0 1 60.330666 0z"></path>
-              </svg>
+            <div className="override-button" onClick={() => updateOverrides(1, index, seleted)}>
+              <img src="/assets/images/arrow2_left.png" />
             </div>
             <HoverTip tip={item.text}>
               <div className="override-text">
-                <div>{item.text}</div>
+                <div>{item.text.length > 3 ? item.text.substring(0, 3) : item.text}</div>
                 <div className="override-value">{item.options[item.selected].description}</div>
               </div>
             </HoverTip>
-            <div>
-              <svg viewBox="0 0 1024 1024" width="24" height="24" fill="#3498db">
-                <path d="M311.168 97.834667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666L664.917333 512 311.168 865.706667a42.666667 42.666667 0 0 0-3.541333 56.32l3.541333 4.010666a42.666667 42.666667 0 0 0 56.32 3.584l4.010667-3.541333 384-384a42.666667 42.666667 0 0 0 3.541333-56.32l-3.541333-3.968-384-384a42.666667 42.666667 0 0 0-60.330667 0z"></path>
-              </svg>
+            <div className="override-button" onClick={() => updateOverrides(-1, index, seleted)}>
+              <img src="/assets/images/arrow2_right.png" />
             </div>
           </div>
         )
