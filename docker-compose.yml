@@ -3,7 +3,7 @@ services:
     image: ylei2023/wendy-apiserver:latest
     restart: always
   wendy-plane:
-    image: wendy-plane:latest
+    image: ylei2023/wendy-plane:latest
     restart: always
     ports:
       - "80:80"
