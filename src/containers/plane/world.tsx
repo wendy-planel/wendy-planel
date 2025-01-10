@@ -168,18 +168,19 @@ function WorldCard(props: WorldCardProps) {
       const lua = await factory.createEngine()
       const leveldataoverride = await lua.doString(world.leveldataoverride)
       const _overrides = world.type === "Master" ? [...WorldOverrides.forest] : [...WorldOverrides.cave]
-      _overrides?.forEach((item) => {
-        const value = leveldataoverride.overrides[item.name]
-        let selected = item.selected
-        for (let i = 0; i < item.options.length; i++) {
-          if (item.options[i].name === value) {
-            selected = i
-            break
+      setOverrides(
+        _overrides.map((item) => {
+          const value = leveldataoverride.overrides[item.name]
+          let selected = item.selected
+          for (let i = 0; i < item.options.length; i++) {
+            if (item.options[i].name === value) {
+              selected = i
+              break
+            }
           }
-        }
-        return {...item, selected: selected}
-      })
-      setOverrides(_overrides)
+          return { ...item, selected: selected }
+        })
+      )
     }
     parseLeveldataoverride()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -204,7 +205,10 @@ function WorldCard(props: WorldCardProps) {
     const value = `${item.name}="${item.options[selected].name}"`
     setDeploy(
       produce((draft) => {
-        draft.cluster.world[world_index].leveldataoverride = draft.cluster.world[world_index].leveldataoverride.replace(old_value, value)
+        draft.cluster.world[world_index].leveldataoverride = draft.cluster.world[world_index].leveldataoverride.replace(
+          old_value,
+          value
+        )
       })
     )
   }
