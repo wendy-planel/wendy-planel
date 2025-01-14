@@ -1,4 +1,5 @@
-const HOST = import.meta.env.VITE_API_HOST || './api'
+import { HOST } from "../common/constants"
+
 
 async function get<T>(url: string, params: any = null): Promise<T> {
   let full_url = url

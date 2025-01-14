@@ -1,7 +1,6 @@
 import { Fetch } from "../api/fetch"
+import { HOST } from "../common/constants"
 import { Deploy as DeploySchema } from "../common/interface"
-
-const HOST = import.meta.env.VITE_API_HOST || './api'
 
 interface readParams {
   status: "running" | "pending" | "stop"

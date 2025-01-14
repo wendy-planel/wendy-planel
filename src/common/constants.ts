@@ -1,3 +1,5 @@
+export const HOST = import.meta.env.VITE_API_HOST || './api'
+
 export const WorldOverrides = {
   forest: [
     {
