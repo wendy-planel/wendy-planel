@@ -470,8 +470,7 @@ input::-webkit-inner-spin-button {
 }
 
 .overrides-box {
-  height: 35vh;
-  min-height: 20rem;
+  max-height: 33vh;
   overflow-y: auto;
 }
 
@@ -558,6 +557,7 @@ input::-webkit-inner-spin-button {
   border-radius: 2%;
   padding: 1rem 1rem 1rem 1rem;
   height: 81%;
+  max-height: 34vh;
 }
 
 .terminal::-webkit-scrollbar {
