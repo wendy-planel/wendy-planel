@@ -406,14 +406,13 @@ input::-webkit-inner-spin-button {
   width: 32rem;
   margin-left: 1rem;
   font-size: 0.8rem;
+  margin-top: 1rem;
 }
 
 .world-nav {
   display: flex;
   justify-content: left;
-  align-items: center;
   height: 2rem;
-  margin-top: 1rem;
   gap: 0.2rem;
 }
 
@@ -429,17 +428,21 @@ input::-webkit-inner-spin-button {
 }
 
 .world-nav-add {
+  width: 1.5rem;
+  height: 1.5rem;
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: center;
   margin-left: 0.2rem;
   cursor: pointer;
 }
 
 .world-nav-remove {
+  width: 1.5rem;
+  height: 1.5rem;
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: center;
   margin-left: 0.2rem;
   cursor: pointer;
@@ -467,7 +470,7 @@ input::-webkit-inner-spin-button {
 }
 
 .overrides-box {
-  height: 34vh;
+  height: 35vh;
   min-height: 20rem;
   overflow-y: auto;
 }
@@ -524,7 +527,7 @@ input::-webkit-inner-spin-button {
   width: 32rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.2rem;
   margin-left: 0.5rem;
   min-height: 25rem;
   margin-top: 1rem;
@@ -554,7 +557,7 @@ input::-webkit-inner-spin-button {
   overflow-y: auto;
   border-radius: 2%;
   padding: 1rem 1rem 1rem 1rem;
-  height: 75%;
+  height: 81%;
 }
 
 .terminal::-webkit-scrollbar {
