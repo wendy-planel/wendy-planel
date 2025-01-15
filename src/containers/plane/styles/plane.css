@@ -118,7 +118,7 @@ input::-webkit-inner-spin-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 18%;
+  height: 15%;
   width: 20rem;
   font-size: 0.8rem;
 }
@@ -144,7 +144,7 @@ input::-webkit-inner-spin-button {
   display: flex;
   align-items: center;
   justify-content: right;
-  height: 20%;
+  height: 15%;
   width: 20rem;
   gap: 2.8rem;
 }
@@ -186,6 +186,7 @@ input::-webkit-inner-spin-button {
 .mod-item {
   display: flex;
   flex-direction: row;
+  margin-bottom: 0.4rem;
   height: 3rem;
 }
 
@@ -465,7 +466,7 @@ input::-webkit-inner-spin-button {
 }
 
 .overrides-box {
-  max-height: 35vh;
+  height: 34.5vh;
   overflow-y: auto;
 }
 
