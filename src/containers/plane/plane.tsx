@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 
 import "./styles/plane.css"
-
 import { Card } from "./card"
+import { event } from "../../common/bus"
+import { HOST } from "../../common/constants"
 import { Deploy as DeployAPI } from "../../api"
 import { Deploy as DeploySchema } from "../../common/interface"
 
@@ -19,13 +20,26 @@ export function Plane() {
     })
     setDeploy(_deploy)
   }
+  useEffect(() => {
+    loadData()
+    const since = Date.now() - 300
+    const source = new EventSource(`${HOST}/console/logs/follow/?since=${since}`)
+    source.onmessage = (message) => {
+      const { key, line } = JSON.parse(message.data)
+      event.emit(key, line)
+    }
+    source.onerror = () => {
+      source.close()
+    }
+    return () => {
+      source.close()
+    }
+  }, [])
   async function onDelete(id: number) {
     await DeployAPI.delete(id)
     await loadData()
   }
-  useEffect(() => {
-    loadData()
-  }, [])
+
   return (
     <div className="plane-box">
       {deploy?.map(function (item) {

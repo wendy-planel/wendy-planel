@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 
 import "./styles/plane.css"
-import { HOST } from "../../common/constants"
+import { event } from "../../common/bus"
+
+
 
 interface TerminalProps {
   id: number
@@ -12,34 +14,28 @@ export function Terminal(props: TerminalProps) {
   const [log, setLog] = useState<string[]>([])
   const ref = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
-    const source = new EventSource(`${HOST}/console/logs/follow/${id}?world_index=${selected}`)
-    source.onmessage = (event) => {
-      setLog((prev) => {
-        prev.push(event.data)
-        return prev.slice(-1000)
+    const key = `${id}_${selected}`
+    const handleNewLog = (message: string) => {
+      setLog((prevLog) => {
+        const newLog = [...prevLog, message]
+        return newLog.slice(-1000)
       })
-      if (ref && ref.current) {
-        ref.current.scrollTop = ref.current.scrollHeight
-      }
     }
-    source.onerror = () => {
-      source.close()
-    }
+    event.on(key, handleNewLog)
     return () => {
-      setLog([])
-      source.close()
+      event.off(key, handleNewLog)
     }
   }, [id, selected])
   return (
     <div className="terminal-box">
+      <div className="terminal-nav">
+        <div className="terminal-nav-item">实时日志</div>
+        <div className="terminal-nav-item">历史日志</div>
+      </div>
       <div className="terminal" ref={ref}>
         {log.map((line, index) => {
           return <div key={index}>{line}</div>
         })}
-      </div>
-      <div className="terminal-nav">
-        <div className="terminal-nav-item">实时日志</div>
-        <div className="terminal-nav-item">历史日志</div>
       </div>
     </div>
   )

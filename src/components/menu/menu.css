@@ -1,6 +1,6 @@
-@media (max-width: 1661px) {
+@media (max-width: 103rem) {
   .sidebar {
-    min-width: 150px;
+    min-width: 10rem;
   }
 }
 
@@ -18,11 +18,11 @@
 .menu-item {
   background-color: #2c2c2c;
   cursor: pointer;
-  height: 40px;
+  height: 2.5rem;
   border-radius: 20%;
   font-size: 0.875rem;
   font-family: Helvetica, Arial, sans-serif;
-  margin: 6px;
+  margin: 0.375.rem;
 }
 
 .menu-item div {
@@ -34,16 +34,12 @@
 
 .menu-item-selected {
   background-color: #9c8181;
-  /* 设置选中项的背景色 */
-  border-radius: 10px;
-  /* 保持与 .menu-item 一致的圆角 */
+  border-radius: 0.625rem;
   width: 90%;
 }
 
 .menu-item:hover {
   background-color: #9c8181;
-  /* 设置选中项的背景色 */
-  border-radius: 10px;
-  /* 保持与 .menu-item 一致的圆角 */
+  border-radius: 0.625rem;
   width: 90%;
 }
