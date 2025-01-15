@@ -21,9 +21,19 @@ async function download(id: number): Promise<Response> {
   return await fetch(HOST + `/cluster/download/${id}`, { method: "GET" })
 }
 
+async function stop(id: number): Promise<Response> {
+  return await fetch(HOST + `/deploy/stop/${id}`, { method: "GET" })
+}
+
+async function restart(id: number): Promise<Response> {
+  return await fetch(HOST + `/deploy/restart/${id}`, { method: "GET" })
+}
+
 export const Deploy = {
   read: read,
   delete: del,
   update: update,
-  download: download
+  download: download,
+  stop: stop,
+  restart: restart
 }

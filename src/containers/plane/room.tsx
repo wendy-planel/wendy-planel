@@ -319,9 +319,10 @@ interface ButtonBoxStates {
 interface ButtonBoxProps {
   deploy: DeploySchema
   onDelete: (id: number) => void
+  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 function ButtonBox(props: ButtonBoxProps) {
-  const { deploy, onDelete } = props
+  const { deploy, onDelete, setDeploy } = props
   const [shareTip, setShareTip] = useState("分享")
   const [states, setStates] = useState<ButtonBoxStates>({
     deleting: false,
@@ -403,6 +404,31 @@ function ButtonBox(props: ButtonBoxProps) {
       deploying: false
     })
   }
+  async function clickStop() {
+    setStates({
+      ...states,
+      executing: true
+    })
+    if (deploy.status === "running") {
+      await DeployAPI.stop(deploy.id)
+      setDeploy(
+        produce((draft) => {
+          draft.status = "stop"
+        })
+      )
+    } else {
+      await DeployAPI.restart(deploy.id)
+      setDeploy(
+        produce((draft) => {
+          draft.status = "running"
+        })
+      )
+    }
+    setStates({
+      ...states,
+      executing: false
+    })
+  }
   return (
     <div className="buttons-box">
       <Button
@@ -437,7 +463,7 @@ function ButtonBox(props: ButtonBoxProps) {
         tip={deploy.status == "running" ? "停止" : "启动"}
         load={states.executing}
         load_tip={deploy.status == "running" ? "启动中" : "启动中"}
-        onClick={() => {}}
+        onClick={clickStop}
       >
         <path d={deploy.status == "running" ? StopIcon : LaunchIcon}></path>
       </Button>
@@ -462,7 +488,7 @@ export function Room(props: RoomProps) {
     <div className="plane-card-room">
       <DeployRoom deploy={deploy} setDeploy={setDeploy}></DeployRoom>
       <SystemInfo stats={stats}></SystemInfo>
-      <ButtonBox deploy={deploy} onDelete={onDelete}></ButtonBox>
+      <ButtonBox deploy={deploy} setDeploy={setDeploy} onDelete={onDelete}></ButtonBox>
     </div>
   )
 }

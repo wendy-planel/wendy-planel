@@ -26,16 +26,23 @@ export function Terminal(props: TerminalProps) {
       event.off(key, handleNewLog)
     }
   }, [id, selected])
+  useEffect(() => {
+    if (ref && ref.current) {
+      ref.current.scrollTop = ref.current.scrollHeight
+    }
+  }, [log])
   return (
     <div className="terminal-box">
       <div className="terminal-nav">
         <div className="terminal-nav-item">实时日志</div>
         <div className="terminal-nav-item">历史日志</div>
       </div>
-      <div className="terminal" ref={ref}>
-        {log.map((line, index) => {
-          return <div key={index}>{line}</div>
-        })}
+      <div className="terminal-outer">
+        <div className="terminal" ref={ref}>
+          {log.map((line, index) => {
+            return <div key={index}>{line}</div>
+          })}
+        </div>
       </div>
     </div>
   )
