@@ -1,6 +1,5 @@
 import { HOST } from "../common/constants"
 
-
 async function get<T>(url: string, params: any = null): Promise<T> {
   let full_url = url
   if (params) {
@@ -15,7 +14,7 @@ async function get<T>(url: string, params: any = null): Promise<T> {
         {} as { [key: string]: string }
       )
     ).toString()
-    full_url += queryString
+    full_url += "?" + queryString
   }
   const response = await fetch(HOST + full_url, { method: "GET", mode: "cors" })
   if (!response.ok) {

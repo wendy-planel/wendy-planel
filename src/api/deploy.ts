@@ -6,7 +6,7 @@ interface readParams {
   status: "running" | "pending" | "stop"
 }
 async function read(params: readParams | undefined = undefined): Promise<DeploySchema[]> {
-  return await Fetch.get<[DeploySchema]>("/deploy", params)
+  return await Fetch.get<DeploySchema[]>("/deploy", params)
 }
 
 async function del(id: number): Promise<number> {

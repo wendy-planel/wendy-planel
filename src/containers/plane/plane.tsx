@@ -22,7 +22,8 @@ export function Plane() {
   }
   useEffect(() => {
     loadData()
-    const source = new EventSource(`${HOST}/console/logs/follow?since=0`)
+    const since = parseInt(Date.now() / 1000 + "") - 1800
+    const source = new EventSource(`${HOST}/console/logs/follow?since=${since}`)
     source.onmessage = (message) => {
       const { key, line } = JSON.parse(message.data)
       event.emit(key, line)
