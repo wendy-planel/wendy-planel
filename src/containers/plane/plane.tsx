@@ -39,7 +39,6 @@ export function Plane() {
     await DeployAPI.delete(id)
     await loadData()
   }
-
   return (
     <div className="plane-box">
       {deploy?.map(function (item) {

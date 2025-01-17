@@ -32,33 +32,36 @@ export function Terminal(props: TerminalProps) {
     }
   }, [log])
   return (
-    <div className="terminal-box">
-      <div className="terminal-nav">
-        <div
-          onClick={() => {
-            setReal(true)
-          }}
-          className="terminal-nav-item"
-          style={{ color: real ? "#fff" : "#666" }}
-        >
-          实时日志
+    <>
+      <div className="terminal-box">
+        <div className="terminal-nav">
+          <div
+            onClick={() => {
+              setReal(true)
+            }}
+            className="terminal-nav-item"
+            style={{ color: real ? "#fff" : "#666" }}
+          >
+            实时日志
+          </div>
+          <div
+            className="terminal-nav-item"
+            style={{ color: real ? "#666" : "#fff" }}
+            onClick={() => {
+              setReal(false)
+            }}
+          >
+            历史日志
+          </div>
         </div>
-        <div
-          className="terminal-nav-item"
-          style={{ color: real ? "#666" : "#fff" }}
-          onClick={() => {
-            setReal(false)
-          }}
-        >
-          历史日志
-        </div>
+        {real ? (
+          <RealTimeLog id={id} selected={selected}></RealTimeLog>
+        ) : (
+          <HistoryLog id={id} selected={selected}></HistoryLog>
+        )}
       </div>
-      {real ? (
-        <RealTimeLog id={id} selected={selected}></RealTimeLog>
-      ) : (
-        <HistoryLog id={id} selected={selected}></HistoryLog>
-      )}
-    </div>
+      <Command id={id} selected={selected}></Command>
+    </>
   )
 }
 
@@ -108,11 +111,15 @@ function HistoryLog(props: TerminalProps) {
       world_index: selected
     })
     setLog(newLogs)
+  }, [id, selected])
+  useEffect(() => {
+    init()
+  }, [init])
+  useEffect(() => {
     if (ref && ref.current) {
       ref.current.scrollTop = ref.current.scrollHeight
     }
-  }, [id, selected])
-  useEffect(() => {init()}, [init])
+  }, [log])
   return (
     <div className="terminal-outer">
       <div className="terminal" ref={ref}>
@@ -120,6 +127,45 @@ function HistoryLog(props: TerminalProps) {
           <div key={index}>{line}</div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function Command(props: TerminalProps) {
+  const { id, selected } = props
+  const run_command = async (command: string) => {
+    console.log(command)
+    await Console.command(id, {
+      command: command,
+      world_index: selected
+    })
+  }
+  return (
+    <div className="command-box">
+      <div className="command-item" onClick={() => run_command("c_rollback(3)")}>
+        回滚1天
+      </div>
+      <div className="command-item" onClick={() => run_command("c_regenerateshard()")}>
+        重置世界
+      </div>
+      <div className="command-item" onClick={() => run_command("c_save()")}>
+        保存存档
+      </div>
+      <div className="command-item" onClick={() => run_command("c_listallplayers()")}>
+        在线玩家
+      </div>
+      <input
+        className="command-input"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            const target = e.target as HTMLInputElement
+            run_command(target.value)
+            target.value = ""
+          }
+        }}
+        type="text"
+        placeholder="输入控制台指令"
+      />
     </div>
   )
 }

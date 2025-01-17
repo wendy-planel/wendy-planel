@@ -568,3 +568,34 @@ input::-webkit-inner-spin-button {
   background: #696b6d;
   border-radius: 1rem;
 }
+
+.command-box {
+  font-size: 0.75rem;
+  width: 9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.command-item {
+  color: pink;
+  background-color: #171718;
+  width: 5rem;
+  height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2%;
+}
+
+.command-input {
+  color: #ffff;
+  font-size: 0.75rem;
+  height: 1.5rem;
+  width: 8rem;
+  border-radius: 2%;
+  background-color: #171718;
+  border: none;
+  margin-bottom: 1rem;
+}
