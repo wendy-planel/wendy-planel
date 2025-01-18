@@ -105,12 +105,20 @@ function DeployRoom(props: DeployRoomProps) {
       })
     )
   }
-  const [copyPath, setCopyPath] = useState<string>(CopyIcon)
-  async function clickCopyButton() {
+  const [copyRoom, setCopyRoom] = useState<string>(CopyIcon)
+  const [copyToken, setCopyToken] = useState<string>(CopyIcon)
+  async function clickCopyRoom() {
     await navigator.clipboard.writeText(getConnection(deploy))
-    setCopyPath(ClickCopyIcon)
+    setCopyRoom(ClickCopyIcon)
     setTimeout(() => {
-      setCopyPath(CopyIcon)
+      setCopyRoom(CopyIcon)
+    }, 500)
+  }
+  async function clickCopyToken() {
+    await navigator.clipboard.writeText(deploy.cluster.cluster_token)
+    setCopyToken(ClickCopyIcon)
+    setTimeout(() => {
+      setCopyToken(CopyIcon)
     }, 500)
   }
   return (
@@ -201,20 +209,16 @@ function DeployRoom(props: DeployRoomProps) {
           onChange={(e) => handleClusterIniMasterPort(e.target.value)}
         />
       </div>
-      <div className="plane-card-line">
+      <div className="plane-card-line copy-box">
         令牌:
         <input
           name="cluster_token"
           value={deploy.cluster.cluster_token}
           onChange={(e) => handleClusterToken(e.target.value)}
         />
-      </div>
-      <div className="plane-card-line copy-box">
-        直连:
-        <input value={getConnection(deploy)} readOnly={true} />
         <div>
           <button
-            onClick={clickCopyButton}
+            onClick={clickCopyToken}
             style={{
               background: "none",
               border: "none",
@@ -223,7 +227,26 @@ function DeployRoom(props: DeployRoomProps) {
             aria-label="复制"
           >
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#3498db">
-              <path d={copyPath}></path>
+              <path d={copyToken}></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="plane-card-line copy-box">
+        直连:
+        <input value={getConnection(deploy)} readOnly={true} />
+        <div>
+          <button
+            onClick={clickCopyRoom}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer"
+            }}
+            aria-label="复制"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#3498db">
+              <path d={copyRoom}></path>
             </svg>
           </button>
         </div>
@@ -398,7 +421,14 @@ function ButtonBox(props: ButtonBoxProps) {
       ...states,
       deploying: true
     })
-    await DeployAPI.update(deploy.id, deploy)
+    const _deploy = await DeployAPI.update(deploy.id, deploy)
+    setDeploy(
+      produce((draft) => {
+        if (draft.id === _deploy.id) {
+          Object.assign(draft, _deploy)
+        }
+      })
+    )
     setStates({
       ...states,
       deploying: false

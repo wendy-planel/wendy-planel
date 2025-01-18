@@ -1,5 +1,4 @@
 import "./styles/nav.css"
-import { GitHubIcon } from "../common/svg"
 import { LeftMenu, MenuItem } from "../components/menu"
 
 export function LeftNav() {
@@ -22,26 +21,5 @@ export function LeftNav() {
         </div>
       </MenuItem>
     </LeftMenu>
-  )
-}
-
-export function TopNav() {
-  return (
-    <div className="top-nav-box">
-      <div className="top-nav-item">
-        <a href="https://github.com/" target="_blank">
-          <svg
-            className="top-nav-github-svg"
-            width="32"
-            height="32"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            version="1.1"
-          >
-            <path d={GitHubIcon}></path>
-          </svg>
-        </a>
-      </div>
-    </div>
   )
 }

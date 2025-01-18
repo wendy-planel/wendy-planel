@@ -1,3 +1,5 @@
+import { DeployCreate } from "./interface"
+
 export const HOST = import.meta.env.VITE_API_HOST || './api'
 
 export const WorldOverrides = {
@@ -8159,3 +8161,61 @@ export const MasterDefault = `return {
   worldgen_id="ENDLESS",
   worldgen_name="无尽" 
 }`
+
+export const DeployCreateDefault: DeployCreate = {
+  "cluster": {
+    "cluster_token": "",
+    "ini": {
+      "game_mode": "endless",
+      "max_players": 6,
+      "pvp": false,
+      "pause_when_empty": true,
+      "vote_enabled": false,
+      "lan_only_cluster": false,
+      "cluster_password": "",
+      "cluster_description": "",
+      "cluster_name": "Wendy Cute",
+      "offline_cluster": false,
+      "cluster_language": "zh",
+      "console_enabled": true,
+      "shard_enabled": true,
+      "bind_ip": "127.0.0.1",
+      "master_ip": "127.0.0.1",
+      "master_port": -1,
+      "cluster_key": "defaultPass"
+    },
+    "world": [
+      {
+        "leveldataoverride": "return {\n  desc=\"永不结束的饥荒沙盒模式。永远可以在绚丽之门复活。\",\n  hideminimap=false,\n  id=\"ENDLESS\",\n  location=\"forest\",\n  max_playlist_position=999,\n  min_playlist_position=0,\n  name=\"无尽\",\n  numrandom_set_pieces=4,\n  override_level_string=false,\n  overrides={\n    alternatehunt=\"default\",\n    angrybees=\"default\",\n    antliontribute=\"default\",\n    autumn=\"default\",\n    bananabush_portalrate=\"default\",\n    basicresource_regrowth=\"always\",\n    bats_setting=\"default\",\n    bearger=\"default\",\n    beefalo=\"default\",\n    beefaloheat=\"default\",\n    beequeen=\"default\",\n    bees=\"default\",\n    bees_setting=\"default\",\n    berrybush=\"default\",\n    birds=\"default\",\n    boons=\"default\",\n    branching=\"default\",\n    brightmarecreatures=\"default\",\n    bunnymen_setting=\"default\",\n    butterfly=\"default\",\n    buzzard=\"default\",\n    cactus=\"default\",\n    cactus_regrowth=\"default\",\n    carrot=\"default\",\n    carrots_regrowth=\"default\",\n    catcoon=\"default\",\n    catcoons=\"default\",\n    chess=\"default\",\n    cookiecutters=\"default\",\n    crabking=\"default\",\n    crow_carnival=\"default\",\n    darkness=\"default\",\n    day=\"default\",\n    deciduousmonster=\"default\",\n    deciduoustree_regrowth=\"default\",\n    deerclops=\"default\",\n    dragonfly=\"default\",\n    dropeverythingondespawn=\"default\",\n    evergreen_regrowth=\"default\",\n    extrastartingitems=\"default\",\n    eyeofterror=\"default\",\n    fishschools=\"default\",\n    flint=\"default\",\n    flowers=\"default\",\n    flowers_regrowth=\"default\",\n    frograin=\"never\",\n    frogs=\"default\",\n    fruitfly=\"default\",\n    ghostenabled=\"always\",\n    ghostsanitydrain=\"none\",\n    gnarwail=\"default\",\n    goosemoose=\"default\",\n    grass=\"default\",\n    grassgekkos=\"default\",\n    hallowed_nights=\"default\",\n    has_ocean=true,\n    healthpenalty=\"always\",\n    hound_mounds=\"default\",\n    houndmound=\"default\",\n    hounds=\"default\",\n    hunger=\"default\",\n    hunt=\"default\",\n    keep_disconnected_tiles=true,\n    klaus=\"default\",\n    krampus=\"default\",\n    layout_mode=\"LinkNodesByKeys\",\n    lessdamagetaken=\"none\",\n    liefs=\"default\",\n    lightcrab_portalrate=\"default\",\n    lightning=\"default\",\n    lightninggoat=\"default\",\n    loop=\"default\",\n    lureplants=\"default\",\n    malbatross=\"default\",\n    marshbush=\"default\",\n    merm=\"default\",\n    merms=\"default\",\n    meteorshowers=\"default\",\n    meteorspawner=\"default\",\n    moles=\"default\",\n    moles_setting=\"default\",\n    monkeytail_portalrate=\"default\",\n    moon_berrybush=\"default\",\n    moon_bullkelp=\"default\",\n    moon_carrot=\"default\",\n    moon_fissure=\"default\",\n    moon_fruitdragon=\"default\",\n    moon_hotspring=\"default\",\n    moon_rock=\"default\",\n    moon_sapling=\"default\",\n    moon_spider=\"default\",\n    moon_spiders=\"default\",\n    moon_starfish=\"default\",\n    moon_tree=\"default\",\n    moon_tree_regrowth=\"default\",\n    mosquitos=\"default\",\n    mushroom=\"default\",\n    mutated_hounds=\"default\",\n    no_joining_islands=true,\n    no_wormholes_to_disconnected_tiles=true,\n    ocean_bullkelp=\"default\",\n    ocean_seastack=\"ocean_default\",\n    ocean_shoal=\"default\",\n    ocean_waterplant=\"ocean_default\",\n    ocean_wobsterden=\"default\",\n    palmcone_seed_portalrate=\"default\",\n    palmconetree=\"default\",\n    palmconetree_regrowth=\"default\",\n    penguins=\"default\",\n    penguins_moon=\"default\",\n    perd=\"default\",\n    petrification=\"default\",\n    pigs=\"default\",\n    pigs_setting=\"default\",\n    pirateraids=\"default\",\n    ponds=\"default\",\n    portal_spawnrate=\"default\",\n    portalresurection=\"always\",\n    powder_monkey_portalrate=\"default\",\n    prefabswaps_start=\"default\",\n    rabbits=\"default\",\n    rabbits_setting=\"default\",\n    reeds=\"default\",\n    reeds_regrowth=\"default\",\n    regrowth=\"default\",\n    resettime=\"none\",\n    rifts_enabled=\"default\",\n    rifts_frequency=\"default\",\n    roads=\"default\",\n    rock=\"default\",\n    rock_ice=\"default\",\n    saltstack_regrowth=\"default\",\n    sapling=\"default\",\n    season_start=\"default\",\n    seasonalstartingitems=\"default\",\n    shadowcreatures=\"default\",\n    sharks=\"default\",\n    spawnmode=\"fixed\",\n    spawnprotection=\"default\",\n    specialevent=\"default\",\n    spider_warriors=\"default\",\n    spiderqueen=\"default\",\n    spiders=\"default\",\n    spiders_setting=\"default\",\n    spring=\"default\",\n    squid=\"default\",\n    stageplays=\"default\",\n    start_location=\"default\",\n    summer=\"default\",\n    summerhounds=\"default\",\n    tallbirds=\"default\",\n    task_set=\"default\",\n    temperaturedamage=\"default\",\n    tentacles=\"default\",\n    terrariumchest=\"default\",\n    touchstone=\"default\",\n    trees=\"default\",\n    tumbleweed=\"default\",\n    twiggytrees_regrowth=\"default\",\n    walrus=\"default\",\n    walrus_setting=\"default\",\n    wasps=\"default\",\n    weather=\"default\",\n    wildfires=\"never\",\n    winter=\"default\",\n    winterhounds=\"default\",\n    winters_feast=\"default\",\n    wobsters=\"default\",\n    world_size=\"default\",\n    wormhole_prefab=\"wormhole\",\n    year_of_the_beefalo=\"default\",\n    year_of_the_bunnyman=\"default\",\n    year_of_the_carrat=\"default\",\n    year_of_the_catcoon=\"default\",\n    year_of_the_gobbler=\"default\",\n    year_of_the_pig=\"default\",\n    year_of_the_varg=\"default\" \n  },\n  playstyle=\"endless\",\n  random_set_pieces={\n    \"Sculptures_2\",\n    \"Sculptures_3\",\n    \"Sculptures_4\",\n    \"Sculptures_5\",\n    \"Chessy_1\",\n    \"Chessy_2\",\n    \"Chessy_3\",\n    \"Chessy_4\",\n    \"Chessy_5\",\n    \"Chessy_6\",\n    \"Maxwell1\",\n    \"Maxwell2\",\n    \"Maxwell3\",\n    \"Maxwell4\",\n    \"Maxwell6\",\n    \"Maxwell7\",\n    \"Warzone_1\",\n    \"Warzone_2\",\n    \"Warzone_3\" \n  },\n  required_prefabs={ \"multiplayer_portal\" },\n  required_setpieces={ \"Sculptures_1\", \"Maxwell5\" },\n  settings_desc=\"永不结束的饥荒沙盒模式。永远可以在绚丽之门复活。\",\n  settings_id=\"ENDLESS\",\n  settings_name=\"无尽\",\n  substitutes={  },\n  version=4,\n  worldgen_desc=\"永不结束的饥荒沙盒模式。永远可以在绚丽之门复活。\",\n  worldgen_id=\"ENDLESS\",\n  worldgen_name=\"无尽\" \n}",
+        "modoverrides": "return {  }",
+        "id": "1",
+        "name": "Master",
+        "is_master": true,
+        "server_port": 10999,
+        "master_server_port": 27016,
+        "authentication_port": 8766,
+        "encode_user_path": true,
+        "type": "Master",
+        "version": "",
+        "docker_api": "unix:///var/run/docker.sock",
+        "container": ""
+      },
+      {
+        "leveldataoverride": "return {\n  background_node_range={ 0, 1 },\n  desc=\"探查洞穴…… 一起！\",\n  hideminimap=false,\n  id=\"DST_CAVE\",\n  location=\"cave\",\n  max_playlist_position=999,\n  min_playlist_position=0,\n  name=\"洞穴\",\n  numrandom_set_pieces=0,\n  override_level_string=false,\n  overrides={\n    atriumgate=\"default\",\n    banana=\"default\",\n    basicresource_regrowth=\"always\",\n    bats=\"default\",\n    bats_setting=\"default\",\n    beefaloheat=\"default\",\n    berrybush=\"default\",\n    boons=\"default\",\n    branching=\"default\",\n    brightmarecreatures=\"default\",\n    bunnymen=\"default\",\n    bunnymen_setting=\"default\",\n    cave_ponds=\"default\",\n    cave_spiders=\"default\",\n    cavelight=\"default\",\n    chess=\"default\",\n    crow_carnival=\"default\",\n    darkness=\"default\",\n    day=\"default\",\n    daywalker=\"default\",\n    dropeverythingondespawn=\"default\",\n    dustmoths=\"default\",\n    earthquakes=\"default\",\n    extrastartingitems=\"default\",\n    fern=\"default\",\n    fissure=\"default\",\n    flint=\"default\",\n    flower_cave=\"default\",\n    flower_cave_regrowth=\"default\",\n    fruitfly=\"default\",\n    ghostenabled=\"always\",\n    ghostsanitydrain=\"none\",\n    grass=\"default\",\n    grassgekkos=\"default\",\n    hallowed_nights=\"default\",\n    healthpenalty=\"always\",\n    hunger=\"default\",\n    krampus=\"default\",\n    layout_mode=\"RestrictNodesByKey\",\n    lessdamagetaken=\"none\",\n    lichen=\"default\",\n    liefs=\"default\",\n    lightflier_flower_regrowth=\"default\",\n    lightfliers=\"default\",\n    loop=\"default\",\n    marshbush=\"default\",\n    merms=\"default\",\n    molebats=\"default\",\n    moles_setting=\"default\",\n    monkey=\"default\",\n    monkey_setting=\"default\",\n    mushgnome=\"default\",\n    mushroom=\"default\",\n    mushtree=\"default\",\n    mushtree_moon_regrowth=\"default\",\n    mushtree_regrowth=\"default\",\n    nightmarecreatures=\"default\",\n    pigs_setting=\"default\",\n    portalresurection=\"always\",\n    prefabswaps_start=\"default\",\n    reeds=\"default\",\n    regrowth=\"default\",\n    resettime=\"none\",\n    rifts_enabled_cave=\"default\",\n    rifts_frequency_cave=\"default\",\n    roads=\"never\",\n    rock=\"default\",\n    rocky=\"default\",\n    rocky_setting=\"default\",\n    sapling=\"default\",\n    season_start=\"default\",\n    seasonalstartingitems=\"default\",\n    shadowcreatures=\"default\",\n    slurper=\"default\",\n    slurtles=\"default\",\n    slurtles_setting=\"default\",\n    snurtles=\"default\",\n    spawnmode=\"fixed\",\n    spawnprotection=\"default\",\n    specialevent=\"default\",\n    spider_dropper=\"default\",\n    spider_hider=\"default\",\n    spider_spitter=\"default\",\n    spider_warriors=\"default\",\n    spiderqueen=\"default\",\n    spiders=\"default\",\n    spiders_setting=\"default\",\n    start_location=\"caves\",\n    task_set=\"cave_default\",\n    temperaturedamage=\"default\",\n    tentacles=\"default\",\n    toadstool=\"default\",\n    touchstone=\"default\",\n    trees=\"default\",\n    weather=\"default\",\n    winters_feast=\"default\",\n    world_size=\"default\",\n    wormattacks=\"default\",\n    wormhole_prefab=\"tentacle_pillar\",\n    wormlights=\"default\",\n    worms=\"default\",\n    year_of_the_beefalo=\"default\",\n    year_of_the_bunnyman=\"default\",\n    year_of_the_carrat=\"default\",\n    year_of_the_catcoon=\"default\",\n    year_of_the_gobbler=\"default\",\n    year_of_the_pig=\"default\",\n    year_of_the_varg=\"default\" \n  },\n  required_prefabs={ \"multiplayer_portal\" },\n  settings_desc=\"探查洞穴…… 一起！\",\n  settings_id=\"DST_CAVE\",\n  settings_name=\"洞穴\",\n  substitutes={  },\n  version=4,\n  worldgen_desc=\"探查洞穴…… 一起！\",\n  worldgen_id=\"DST_CAVE\",\n  worldgen_name=\"洞穴\" \n}\n",
+        "modoverrides": "return {  }",
+        "id": "2",
+        "name": "Caves",
+        "is_master": false,
+        "server_port": 10999,
+        "master_server_port": 27017,
+        "authentication_port": 8767,
+        "encode_user_path": true,
+        "type": "Caves",
+        "version": "",
+        "docker_api": "unix:///var/run/docker.sock",
+        "container": ""
+      }
+    ]
+  },
+  "status": "pending"
+}

@@ -1,3 +1,4 @@
+import { produce } from "immer"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import "./styles/plane.css"
@@ -67,31 +68,33 @@ export function Terminal(props: TerminalProps) {
 
 function RealTimeLog(props: TerminalProps) {
   const { id, selected } = props
-  const [log, setLog] = useState<string[]>([])
+  const [log, setLog] = useState<Record<string, string[]>>({})
   const ref = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
     const key = `${id}_${selected}`
     const handleNewLog = (message: string) => {
-      setLog((prevLog) => {
-        const newLog = [...prevLog, message]
-        return newLog.slice(-1000)
-      })
+      setLog(
+        produce((draft) => {
+          const _log = draft[key] || []
+          _log.push(message)
+          draft[key] = _log.slice(-1000)
+        })
+      )
     }
     event.on(key, handleNewLog)
     return () => {
       event.off(key, handleNewLog)
     }
   }, [id, selected])
-  // TODO 如果用户滚动了, 就停止自动到底部
   useEffect(() => {
     if (ref && ref.current) {
       ref.current.scrollTop = ref.current.scrollHeight
     }
-  }, [log])
+  }, [log, selected])
   return (
     <div className="terminal-outer">
       <div className="terminal" ref={ref}>
-        {log.map((line, index) => {
+        {log[`${id}_${selected}`]?.map((line, index) => {
           return <div key={index}>{line}</div>
         })}
       </div>
@@ -134,7 +137,6 @@ function HistoryLog(props: TerminalProps) {
 function Command(props: TerminalProps) {
   const { id, selected } = props
   const run_command = async (command: string) => {
-    console.log(command)
     await Console.command(id, {
       command: command,
       world_index: selected

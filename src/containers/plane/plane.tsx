@@ -2,15 +2,17 @@ import { useEffect, useState } from "react"
 
 import "./styles/plane.css"
 import { Card } from "./card"
+import { TopNav } from "./nav"
 import { event } from "../../common/bus"
 import { HOST } from "../../common/constants"
 import { Deploy as DeployAPI } from "../../api"
 import { Deploy as DeploySchema } from "../../common/interface"
 
 export function Plane() {
-  const [deploy, setDeploy] = useState<DeploySchema[]>()
+  const [deploy, setDeploy] = useState<DeploySchema[]>([])
   async function loadData() {
     const _deploy = await DeployAPI.read()
+    _deploy.forEach((item) => item._show = true)
     _deploy.sort((a, b) => {
       if (a.status === b.status) {
         return new Date(b.updated_at) < new Date(a.updated_at) ? 1 : -1
@@ -40,10 +42,17 @@ export function Plane() {
     await loadData()
   }
   return (
-    <div className="plane-box">
-      {deploy?.map(function (item) {
-        return <Card key={item.id} deploy={item} onDelete={onDelete}></Card>
-      })}
+    <div>
+      <TopNav deploy={deploy} setDeploy={setDeploy}></TopNav>
+      <div className="plane-box">
+        {deploy.map(function (item) {
+          if (item._show) {
+            return <Card key={item.id} deploy={item} onDelete={onDelete}></Card>
+          } else {
+            return <></>
+          }
+        })}
+      </div>
     </div>
   )
 }

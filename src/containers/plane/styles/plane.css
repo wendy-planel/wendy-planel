@@ -579,6 +579,7 @@ input::-webkit-inner-spin-button {
 }
 
 .command-item {
+  cursor: pointer;
   color: pink;
   background-color: #171718;
   width: 5rem;
@@ -586,7 +587,11 @@ input::-webkit-inner-spin-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 2%;
+  border-radius: 0.3rem;
+}
+
+.command-item:hover {
+  color: #ffff;
 }
 
 .command-input {
@@ -594,8 +599,68 @@ input::-webkit-inner-spin-button {
   font-size: 0.75rem;
   height: 1.5rem;
   width: 8rem;
-  border-radius: 2%;
+  border-radius: 0.3rem;
   background-color: #171718;
   border: none;
   margin-bottom: 1rem;
+}
+
+.command-input::placeholder {
+  text-indent: 0.3rem;
+}
+
+
+.top-nav-box {
+  width: 90vw;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  height: 6vh;
+  background-color: #2c2c2c;
+  margin-top: 2vh;
+  margin-left: 1vw;
+  border-radius: 1vh;
+  gap: 1rem;
+}
+
+.top-nav-github-svg {
+  color: white;
+  fill: currentColor;
+}
+
+.top-nav-item {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 2%;
+}
+
+.top-nav-button {
+  cursor: pointer;
+  height: 2rem;
+  width: 5.5rem;
+  display: flex;
+  background-color: black;
+  font-size: 0.8rem;
+  align-items: center;
+  color: pink;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+.top-nav-button:hover {
+  color: #fff;
+}
+
+.nav-top-input {
+  color: #ffff;
+  font-size: 0.75rem;
+  height: 2rem;
+  width: 40rem;
+  border-radius: 1rem;
+  background-color: #171718;
+  border: none;
+  margin-right: 40%;
+  text-indent: 1rem;
 }

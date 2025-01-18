@@ -8,7 +8,7 @@ interface LeftMenuProps {
 }
 export function LeftMenu(props: LeftMenuProps) {
   const { current = 0, children } = props
-  const [selected, setSelected] = useState(current)
+  const [selected, setSelected] = useState<number>(current)
   // 处理子节点点击事件
   const handleChildOnClick = (
     index: number,

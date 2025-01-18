@@ -46,6 +46,12 @@ export interface Deploy {
   cluster: DeployCluster
   updated_at: string
   created_at: string
+  _show: boolean
+}
+
+export interface DeployCreate {
+  status: "running" | "pending"
+  cluster: DeployCluster
 }
 
 export interface Tag {

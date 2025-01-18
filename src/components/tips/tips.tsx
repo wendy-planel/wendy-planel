@@ -8,7 +8,7 @@ interface HoverTipProps {
 }
 export const HoverTip = (props: HoverTipProps) => {
   const { children, tip } = props
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState<boolean>(false)
   const showTip = useCallback(() => setVisible(true), [])
   const hideTip = useCallback(() => setVisible(false), [])
   return (

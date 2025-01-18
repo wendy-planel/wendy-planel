@@ -1,6 +1,6 @@
 import { Fetch } from "../api/fetch"
 import { HOST } from "../common/constants"
-import { Deploy as DeploySchema } from "../common/interface"
+import { Deploy as DeploySchema, DeployCreate } from "../common/interface"
 
 interface readParams {
   status: "running" | "pending" | "stop"
@@ -15,6 +15,10 @@ async function del(id: number): Promise<number> {
 
 async function update(id: number, deploy: DeploySchema): Promise<DeploySchema> {
   return await Fetch.put<DeploySchema>(`/deploy/${id}`, null, deploy.cluster)
+}
+
+async function create(deploy: DeployCreate): Promise<DeploySchema> {
+  return await Fetch.post<DeploySchema>(`/deploy`, null, deploy)
 }
 
 async function download(id: number): Promise<Response> {
@@ -35,5 +39,6 @@ export const Deploy = {
   update: update,
   download: download,
   stop: stop,
-  restart: restart
+  restart: restart,
+  create: create,
 }
