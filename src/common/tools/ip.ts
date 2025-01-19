@@ -3,12 +3,7 @@ export function isPublicIP(ip: string): boolean {
   if (parts.length !== 4 || parts.some((part) => isNaN(part) || part < 0 || part > 255)) {
     return false
   }
-  return (
-    parts[0] === 10 ||
-    (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
-    (parts[0] === 192 && parts[1] === 168) ||
-    parts[0] === 127
-  )
+  return [10, 172, 192, 127].indexOf(parts[0]) === -1
 }
 
 export function extractFirstValidIP(text: string): string | null {
