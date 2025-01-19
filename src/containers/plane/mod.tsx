@@ -6,7 +6,7 @@ import "./styles/plane.css"
 import { Mod as ModAPI } from "../../api"
 import { LoadIcon } from "../../common/svg"
 import { HoverTip } from "../../components/tips"
-import { Deploy as DeploySchema, PublishedFileDetail, ConfigurationOption } from "../../common/interface"
+import { Configuration, PublishedFileDetail, ConfigurationOption, Deploy as DeploySchema } from "../../common/interface"
 
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
 
@@ -14,54 +14,6 @@ interface ModBoxContent {
   pick: PublishedFileDetail[]
   search: PublishedFileDetail[]
   state?: "searching" | "parsing" | undefined
-}
-
-function rewriteModoverrides(
-  pick: PublishedFileDetail[],
-  setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
-) {
-  const pick_configuration = []
-  for (const mod of pick) {
-    if (mod.configuration !== undefined) {
-      pick_configuration.push({
-        id: mod.publishedfileid,
-        configuration: mod.configuration
-      })
-    }
-  }
-  let modoverrides = "return {"
-  for (const modconfig of pick_configuration) {
-    modoverrides += `["workshop-${modconfig.id}"]={\n`
-    modoverrides += "configuration_options={\n"
-    const config = modconfig.configuration.configuration_options
-    for (const key in config) {
-      const value = config[key]
-      let luaValue: any = null
-      if (typeof value === "string") {
-        luaValue = `"${value}"`
-      } else if (typeof value === "boolean") {
-        luaValue = value ? "true" : "false"
-      } else if (typeof value === "number") {
-        luaValue = value
-      } else if (Array.isArray(value)) {
-        luaValue = `{${value.join(", ")}}`
-      } else {
-        luaValue = "nil"
-      }
-      modoverrides += `  ${key} = ${luaValue},\n`
-    }
-    modoverrides += "},\n"
-    modoverrides += "enabled=true"
-    modoverrides += "},\n"
-  }
-  modoverrides += "}"
-  setDeploy(
-    produce((draft) => {
-      for (const world of draft.cluster.world) {
-        world.modoverrides = modoverrides
-      }
-    })
-  )
 }
 
 interface ModConfigEditProps {
@@ -199,24 +151,37 @@ function Mod(props: ModProps) {
     const search = content.search.filter((e) => e.publishedfileid !== mod.publishedfileid)
     const pick = content.pick.filter((e) => e.publishedfileid !== mod.publishedfileid)
     setAdding(true)
-    const config = await ModAPI.readConfig([mod.publishedfileid])
-    if (config.length > 0) {
-      const mod_config = config[0]
-      const lua = await factory.createEngine()
-      await lua.doString(mod_config.code)
-      pick.push({
-        ...mod,
-        code: mod.code,
-        configuration_options: lua.global.get("configuration_options")
-      })
-      setContent(
-        produce((draft) => {
-          draft.pick = pick
-          draft.search = search
+    try {
+      const config = await ModAPI.readConfig([mod.publishedfileid])
+      if (config.length > 0) {
+        const lua = await factory.createEngine()
+        await lua.doString(config[0].code)
+        const configuration_options = lua.global.get("configuration_options")
+        const configuration: Configuration = {
+          enabled: true,
+          configuration_options: {}
+        }
+        for (const item of configuration_options) {
+          if (item.name) {
+            configuration.configuration_options[item.name] = item.default
+          }
+        }
+        pick.push({
+          ...mod,
+          code: config[0].code,
+          configuration: configuration,
+          configuration_options: configuration_options
         })
-      )
+        setContent(
+          produce((draft) => {
+            draft.pick = pick
+            draft.search = search
+          })
+        )
+      }
+    } finally {
+      setAdding(false)
     }
-    setAdding(false)
   }
   return (
     <div className="mod-item">
@@ -311,15 +276,23 @@ function SearchMod(props: SearchModProps) {
           draft.state = "searching"
         })
       )
-      const search = await ModAPI.search(key)
-      setContent(
-        produce((draft) => {
-          draft.state = undefined
-          draft.search = search.filter((item) => {
-            return !mods.includes(item.publishedfileid) && JSON.stringify(item.tags).indexOf("client_only_mod") == -1
+      try {
+        const search = await ModAPI.search(key)
+        setContent(
+          produce((draft) => {
+            draft.state = undefined
+            draft.search = search.filter((item) => {
+              return !mods.includes(item.publishedfileid) && JSON.stringify(item.tags).indexOf("client_only_mod") == -1
+            })
           })
-        })
-      )
+        )
+      } catch {
+        setContent(
+          produce((draft) => {
+            draft.state = undefined
+          })
+        )
+      }
     }
   }
   return (
@@ -398,13 +371,13 @@ export function ModBox(props: ModBoxProps) {
       const pick = await ModAPI.read(mods)
       const pick_config = await ModAPI.readConfig(mods)
       try {
-        for (const item of pick) {
-          const config = pick_config.find((e) => e.id == item.publishedfileid)
+        for (let i = 0; i < pick.length; i++) {
+          const config = pick_config.find((e) => e.id == pick[i].publishedfileid)
           if (config) {
-            item.code = config.code
+            pick[i].code = config.code
             await lua.doString(config.code)
-            item.configuration_options = lua.global.get("configuration_options") || []
-            item.configuration = modconfig[`workshop-${item.publishedfileid}`]
+            pick[i].configuration_options = lua.global.get("configuration_options") || []
+            pick[i].configuration = modconfig[`workshop-${pick[i].publishedfileid}`]
           }
         }
       } finally {
@@ -420,11 +393,50 @@ export function ModBox(props: ModBoxProps) {
   }
   useEffect(() => {
     loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
-    rewriteModoverrides(content.pick, setDeploy)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const pick_configuration = []
+    for (const mod of content.pick) {
+      if (mod.configuration !== undefined) {
+        pick_configuration.push({
+          id: mod.publishedfileid,
+          configuration: mod.configuration
+        })
+      }
+    }
+    let modoverrides = "return {"
+    for (const modconfig of pick_configuration) {
+      modoverrides += `["workshop-${modconfig.id}"]={\n`
+      modoverrides += "configuration_options={\n"
+      const config = modconfig.configuration.configuration_options
+      for (const key in config) {
+        const value = config[key]
+        let luaValue: any = null
+        if (typeof value === "string") {
+          luaValue = `"${value}"`
+        } else if (typeof value === "boolean") {
+          luaValue = value ? "true" : "false"
+        } else if (typeof value === "number") {
+          luaValue = value
+        } else if (Array.isArray(value)) {
+          luaValue = `{${value.join(", ")}}`
+        } else {
+          luaValue = "nil"
+        }
+        modoverrides += `  ${key} = ${luaValue},\n`
+      }
+      modoverrides += "},\n"
+      modoverrides += "enabled=true"
+      modoverrides += "},\n"
+    }
+    modoverrides += "}"
+    setDeploy(
+      produce((draft) => {
+        for (let i = 0; i < draft.cluster.world.length; i++) {
+          draft.cluster.world[i].modoverrides = modoverrides
+        }
+      })
+    )
   }, [content.pick])
   return (
     <div className="mod-box">

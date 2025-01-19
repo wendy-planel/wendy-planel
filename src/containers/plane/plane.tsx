@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import "./styles/plane.css"
 import { Card } from "./card"
@@ -9,10 +9,11 @@ import { Deploy as DeployAPI } from "../../api"
 import { Deploy as DeploySchema } from "../../common/interface"
 
 export function Plane() {
+  const plane_box = useRef<HTMLDivElement | null>(null)
   const [deploy, setDeploy] = useState<DeploySchema[]>([])
   async function loadData() {
     const _deploy = await DeployAPI.read()
-    _deploy.forEach((item) => item._show = true)
+    _deploy.forEach((item) => (item._show = true))
     _deploy.sort((a, b) => {
       if (a.status === b.status) {
         return new Date(b.updated_at) < new Date(a.updated_at) ? 1 : -1
@@ -21,6 +22,11 @@ export function Plane() {
       }
     })
     setDeploy(_deploy)
+  }
+  const scrollTop = () => {
+    if (plane_box && plane_box.current) {
+      plane_box.current.scrollTop = 0
+    }
   }
   useEffect(() => {
     loadData()
@@ -43,8 +49,8 @@ export function Plane() {
   }
   return (
     <div>
-      <TopNav deploy={deploy} setDeploy={setDeploy}></TopNav>
-      <div className="plane-box">
+      <TopNav deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></TopNav>
+      <div className="plane-box" ref={plane_box}>
         {deploy.map(function (item) {
           if (item._show) {
             return <Card key={item.id} deploy={item} onDelete={onDelete}></Card>

@@ -10,15 +10,16 @@ import { Deploy as DeploySchema } from "../../common/interface"
 
 interface TopNavProps {
   deploy: DeploySchema[]
+  scrollTop: () => void
   setDeploy: React.Dispatch<React.SetStateAction<DeploySchema[]>>
 }
 export function TopNav(props: TopNavProps) {
-  const { deploy, setDeploy } = props
+  const { deploy, scrollTop, setDeploy } = props
   return (
     <div className="top-nav-box">
-      <Search deploy={deploy} setDeploy={setDeploy}></Search>
-      <Create deploy={deploy} setDeploy={setDeploy}></Create>
-      <Upload deploy={deploy} setDeploy={setDeploy}></Upload>
+      <Search deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></Search>
+      <Create deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></Create>
+      <Upload deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></Upload>
       <div className="top-nav-item">
         <a href="https://github.com/" target="_blank">
           <svg
@@ -38,7 +39,7 @@ export function TopNav(props: TopNavProps) {
 }
 
 function Upload(props: TopNavProps) {
-  const { deploy, setDeploy } = props
+  const { deploy, scrollTop, setDeploy } = props
   const [visible, setVisible] = useState<boolean>(false)
   return (
     <div
@@ -83,6 +84,7 @@ function Upload(props: TopNavProps) {
               item._show = true
               setDeploy([item, ...deploy])
             }
+            scrollTop()
           }
         }}
       />
@@ -91,13 +93,14 @@ function Upload(props: TopNavProps) {
 }
 
 function Create(props: TopNavProps) {
-  const { deploy, setDeploy } = props
+  const { deploy, scrollTop, setDeploy } = props
   return (
     <div
       onClick={async () => {
         const item = await DeployAPI.create(DeployCreateDefault)
         item._show = true
         setDeploy([item, ...deploy])
+        scrollTop()
       }}
       className="top-nav-button"
     >

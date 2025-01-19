@@ -8174,7 +8174,7 @@ export const DeployCreateDefault: DeployCreate = {
       "lan_only_cluster": false,
       "cluster_password": "",
       "cluster_description": "",
-      "cluster_name": "Wendy Cute",
+      "cluster_name": "",
       "offline_cluster": false,
       "cluster_language": "zh",
       "console_enabled": true,

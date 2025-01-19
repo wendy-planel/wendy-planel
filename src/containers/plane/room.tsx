@@ -205,7 +205,7 @@ function DeployRoom(props: DeployRoomProps) {
         端口:
         <input
           name="master_port"
-          value={deploy.cluster.ini.master_port}
+          value={deploy.cluster.ini.master_port === -1 ? "auto" : deploy.cluster.ini.master_port}
           onChange={(e) => handleClusterIniMasterPort(e.target.value)}
         />
       </div>
