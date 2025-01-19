@@ -21,7 +21,7 @@ export function TopNav(props: TopNavProps) {
       <Create deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></Create>
       <Upload deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></Upload>
       <div className="top-nav-item">
-        <a href="https://github.com/" target="_blank">
+        <a href="https://github.com/wendy-plane/wendy-plane" target="_blank">
           <svg
             className="top-nav-github-svg"
             width="32"
