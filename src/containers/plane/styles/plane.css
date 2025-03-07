@@ -664,5 +664,6 @@ input::-webkit-inner-spin-button {
   border-radius: 1rem;
   background-color: #171718;
   border: none;
+  margin-right: 40%;
   text-indent: 1rem;
 }
