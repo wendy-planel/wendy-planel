@@ -50,7 +50,7 @@ export function Plane() {
   return (
     <div>
       <TopNav deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy}></TopNav>
-      <div className="plane-box" ref={plane_box}>
+      <div key="1" className="plane-box" ref={plane_box}>
         {deploy.map(function (item) {
           if (item._show) {
             return <Card key={item.id} deploy={item} onDelete={onDelete}></Card>
