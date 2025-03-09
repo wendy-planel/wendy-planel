@@ -10,23 +10,22 @@ import { extractFirstValidIP, isPublicIP } from "../../common/tools/ip"
 import { LoadIcon, StopIcon, CopyIcon, LaunchIcon, ClickCopyIcon } from "../../common/svg"
 
 
-function copyToClipboard(text: string) {
+async function copyToClipboard(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
-    return navigator.clipboard.writeText(text)
+    return await navigator.clipboard.writeText(text)
   } else {
-    let input = document.createElement('input')
-    input.style.position = 'fixed'
-    input.style.top = '-10000px'
-    input.style.zIndex = '-999'
-    document.body.appendChild(input)
-    input.value = text
-    input.focus()
-    input.select()
+    let textarea = document.createElement('textarea')
+    textarea.style.position = 'fixed'
+    textarea.style.top = '-10000px'
+    textarea.style.zIndex = '-999'
     try {
+      document.body.appendChild(textarea)
+      textarea.value = text
+      textarea.focus()
+      textarea.select()
       document.execCommand('copy')
-      document.body.removeChild(input)
     } finally {
-      document.body.removeChild(input)
+      document.body.removeChild(textarea)
     }
   }
 }
