@@ -9,21 +9,47 @@ import { Deploy as DeploySchema } from "../../common/interface"
 import { extractFirstValidIP, isPublicIP } from "../../common/tools/ip"
 import { LoadIcon, StopIcon, CopyIcon, LaunchIcon, ClickCopyIcon } from "../../common/svg"
 
+
+function copyToClipboard(text: string) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text)
+  } else {
+    let input = document.createElement('input')
+    input.style.position = 'fixed'
+    input.style.top = '-10000px'
+    input.style.zIndex = '-999'
+    document.body.appendChild(input)
+    input.value = text
+    input.focus()
+    input.select()
+    try {
+      document.execCommand('copy')
+      document.body.removeChild(input)
+    } finally {
+      document.body.removeChild(input)
+    }
+  }
+}
+
+
 function getConnection(deploy: DeploySchema) {
-  const port = deploy.cluster.ini.master_port
   const password = deploy.cluster.ini.cluster_password
   const urlObj = new URL(window.location.href)
   let ip: string = urlObj.hostname
   if (isPublicIP(deploy.cluster.ini.master_ip)) {
     ip = deploy.cluster.ini.master_ip
   }
+  let port = -1
   for (const world of deploy.cluster.world) {
-    if (world.type === "Master" && world.docker_api != "unix:///var/run/docker.sock") {
-      const docker_ip = extractFirstValidIP(world.docker_api)
-      if (docker_ip) {
-        ip = docker_ip
-        break
+    if (world.type === "Master") {
+      port = world.server_port
+      if (world.docker_api != "unix:///var/run/docker.sock") {
+        const docker_ip = extractFirstValidIP(world.docker_api)
+        if (docker_ip) {
+          ip = docker_ip
+        }
       }
+      break
     }
   }
   return `c_connect("${ip}", ${port}, "${password}")`
@@ -35,10 +61,18 @@ interface DeployRoomProps {
 }
 function DeployRoom(props: DeployRoomProps) {
   const { deploy, setDeploy } = props
-  const handleClusterIniMasterPort = (master_port: string) => {
+  const handlePort = (type: "Master" | "Caves", port: string) => {
     setDeploy(
       produce((draft) => {
-        draft.cluster.ini.master_port = parseInt(master_port)
+        const world = []
+        let flag = true
+        for (const item of draft.cluster.world) {
+          if (item.type === type && flag) {
+            world.push({ ...item, server_port: parseInt(port) })
+            flag = false
+          }
+        }
+        draft.cluster.world = world
       })
     )
   }
@@ -46,6 +80,13 @@ function DeployRoom(props: DeployRoomProps) {
     setDeploy(
       produce((draft) => {
         draft.cluster.ini.master_ip = master_ip
+      })
+    )
+  }
+  const handleClusterIniMasterPort = (port: string) => {
+    setDeploy(
+      produce((draft) => {
+        draft.cluster.ini.master_port = parseInt(port)
       })
     )
   }
@@ -91,13 +132,6 @@ function DeployRoom(props: DeployRoomProps) {
       })
     )
   }
-  const handleClusterIniPvp = (enable: boolean) => {
-    setDeploy(
-      produce((draft) => {
-        draft.cluster.ini.pvp = enable
-      })
-    )
-  }
   const handleClusterIniVote = (enable: boolean) => {
     setDeploy(
       produce((draft) => {
@@ -105,22 +139,16 @@ function DeployRoom(props: DeployRoomProps) {
       })
     )
   }
-  const [copyRoom, setCopyRoom] = useState<string>(CopyIcon)
   const [copyToken, setCopyToken] = useState<string>(CopyIcon)
-  async function clickCopyRoom() {
-    await navigator.clipboard.writeText(getConnection(deploy))
-    setCopyRoom(ClickCopyIcon)
-    setTimeout(() => {
-      setCopyRoom(CopyIcon)
-    }, 500)
-  }
   async function clickCopyToken() {
-    await navigator.clipboard.writeText(deploy.cluster.cluster_token)
+    await copyToClipboard(deploy.cluster.cluster_token)
     setCopyToken(ClickCopyIcon)
     setTimeout(() => {
       setCopyToken(CopyIcon)
     }, 500)
   }
+  const master = deploy.cluster.world.find((e) => e.type === "Master")
+  const caves = deploy.cluster.world.find((e) => e.type === 'Caves')
   return (
     <div>
       <div className="plane-card-line">
@@ -156,43 +184,6 @@ function DeployRoom(props: DeployRoomProps) {
           onChange={(e) => handleClusterIniMaxPlayers(e.target.value)}
         />
       </div>
-      <div className="plane-card-line radio-box">
-        模式:
-        <div className="radio-item" onClick={() => handleClusterIniGameMode("endless")}>
-          <input type="radio" readOnly={true} checked={deploy.cluster.ini.game_mode === "endless"} />
-          <span>无尽</span>
-        </div>
-        <div className="radio-item" onClick={() => handleClusterIniGameMode("survival")}>
-          <input type="radio" readOnly={true} checked={deploy.cluster.ini.game_mode === "survival"} />
-          <span>生存</span>
-        </div>
-        <div className="radio-item" onClick={() => handleClusterIniGameMode("wilderness")}>
-          <input type="radio" readOnly={true} checked={deploy.cluster.ini.game_mode === "wilderness"} />
-          <span>荒野</span>
-        </div>
-      </div>
-      <div className="plane-card-line radio-box">
-        PVP:
-        <div className="radio-item" onClick={() => handleClusterIniPvp(false)}>
-          <input type="radio" readOnly={true} checked={!deploy.cluster.ini.pvp} />
-          <span>关闭</span>
-        </div>
-        <div className="radio-item" onClick={() => handleClusterIniPvp(true)}>
-          <input type="radio" readOnly={true} checked={deploy.cluster.ini.pvp} />
-          <span>开启</span>
-        </div>
-      </div>
-      <div className="plane-card-line radio-box">
-        投票:
-        <div className="radio-item" onClick={() => handleClusterIniVote(false)}>
-          <input type="radio" readOnly={true} checked={!deploy.cluster.ini.vote_enabled} />
-          <span>关闭</span>
-        </div>
-        <div className="radio-item" onClick={() => handleClusterIniVote(true)}>
-          <input type="radio" readOnly={true} checked={deploy.cluster.ini.vote_enabled} />
-          <span>开启</span>
-        </div>
-      </div>
       <div className="plane-card-line">
         主机:
         <input
@@ -202,11 +193,27 @@ function DeployRoom(props: DeployRoomProps) {
         />
       </div>
       <div className="plane-card-line">
-        端口:
+        主机端口:
         <input
-          name="master_port"
-          value={deploy.cluster.ini.master_port === -1 ? "auto" : deploy.cluster.ini.master_port}
+          name="master_ip"
+          value={deploy.cluster.ini.master_port == -1 ? "auto" : deploy.cluster.ini.master_port}
           onChange={(e) => handleClusterIniMasterPort(e.target.value)}
+        />
+      </div>
+      <div className="plane-card-line">
+        森林端口:
+        <input
+          name="master_server_port"
+          value={(!master || master.server_port == -1) ? "auto" : master?.server_port}
+          onChange={(e) => handlePort("Master", e.target.value)}
+        />
+      </div>
+      <div className="plane-card-line">
+        洞穴端口:
+        <input
+          name="caves_server_port"
+          value={(!caves || caves.server_port === -1) ? "auto" : caves?.server_port}
+          onChange={(e) => handlePort("Caves", e.target.value)}
         />
       </div>
       <div className="plane-card-line copy-box">
@@ -232,23 +239,30 @@ function DeployRoom(props: DeployRoomProps) {
           </button>
         </div>
       </div>
-      <div className="plane-card-line copy-box">
-        直连:
-        <input value={getConnection(deploy)} readOnly={true} />
-        <div>
-          <button
-            onClick={clickCopyRoom}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer"
-            }}
-            aria-label="复制"
-          >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="#3498db">
-              <path d={copyRoom}></path>
-            </svg>
-          </button>
+      <div className="plane-card-line radio-box">
+        投票:
+        <div className="radio-item" onClick={() => handleClusterIniVote(false)}>
+          <input type="radio" readOnly={true} checked={!deploy.cluster.ini.vote_enabled} />
+          <span>关闭</span>
+        </div>
+        <div className="radio-item" onClick={() => handleClusterIniVote(true)}>
+          <input type="radio" readOnly={true} checked={deploy.cluster.ini.vote_enabled} />
+          <span>开启</span>
+        </div>
+      </div>
+      <div className="plane-card-line radio-box">
+        模式:
+        <div className="radio-item" onClick={() => handleClusterIniGameMode("endless")}>
+          <input type="radio" readOnly={true} checked={deploy.cluster.ini.game_mode === "endless"} />
+          <span>无尽</span>
+        </div>
+        <div className="radio-item" onClick={() => handleClusterIniGameMode("survival")}>
+          <input type="radio" readOnly={true} checked={deploy.cluster.ini.game_mode === "survival"} />
+          <span>生存</span>
+        </div>
+        <div className="radio-item" onClick={() => handleClusterIniGameMode("wilderness")}>
+          <input type="radio" readOnly={true} checked={deploy.cluster.ini.game_mode === "wilderness"} />
+          <span>荒野</span>
         </div>
       </div>
     </div>
@@ -337,7 +351,6 @@ interface ButtonBoxStates {
   deleting: boolean
   downloading: boolean
   deploying: boolean
-  executing: boolean
 }
 interface ButtonBoxProps {
   deploy: DeploySchema
@@ -351,8 +364,8 @@ function ButtonBox(props: ButtonBoxProps) {
     deleting: false,
     downloading: false,
     deploying: false,
-    executing: false
   })
+
   async function handleShare() {
     let text = ""
     text = text + `房间: ${deploy.cluster.ini.cluster_name}\n`
@@ -360,8 +373,8 @@ function ButtonBox(props: ButtonBoxProps) {
     text = text + `密码: ${deploy.cluster.ini.cluster_password}\n`
     text = text + `描述: ${deploy.cluster.ini.cluster_description}\n`
     text = text + `直连: ${getConnection(deploy)}\n`
-    await navigator.clipboard.writeText(text)
-    setShareTip("成功复制")
+    await copyToClipboard(text)
+    setShareTip("已复制")
   }
   async function clickDelete() {
     setStates({
@@ -416,7 +429,7 @@ function ButtonBox(props: ButtonBoxProps) {
       downloading: false
     })
   }
-  async function Save() {
+  async function clickRun() {
     setStates({
       ...states,
       deploying: true
@@ -429,17 +442,6 @@ function ButtonBox(props: ButtonBoxProps) {
         }
       })
     )
-    setStates({
-      ...states,
-      deploying: false
-    })
-  }
-  async function clickRun() {
-    setStates({
-      ...states,
-      executing: true
-    })
-    await Save()
     if (deploy.status === "running") {
       await DeployAPI.stop(deploy.id)
       setDeploy(
@@ -457,7 +459,7 @@ function ButtonBox(props: ButtonBoxProps) {
     }
     setStates({
       ...states,
-      executing: false
+      deploying: false
     })
   }
   return (
@@ -488,8 +490,8 @@ function ButtonBox(props: ButtonBoxProps) {
       </Button>
       <Button
         tip={deploy.status == "running" ? "停止" : "启动"}
-        load={states.executing}
-        load_tip={deploy.status == "running" ? "启动中" : "启动中"}
+        load={states.deploying}
+        load_tip={deploy.status == "running" ? "启动中" : "停止中"}
         onClick={clickRun}
       >
         <path d={deploy.status == "running" ? StopIcon : LaunchIcon}></path>
