@@ -23,7 +23,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/wendy-plane
-          tags: latest
+          tags: |
+            type=raw,value=latest
+            type=raw,value={{date 'YYYYMMDDHHmm'}}
 
       - name: Build and push
         uses: docker/build-push-action@v6
