@@ -17,9 +17,17 @@ interface WorldProps {
 export function World(props: WorldProps) {
   const { deploy, setDeploy } = props
   const [selected, setSelected] = useState<number>(0)
+  const [log, setLog] = useState<Record<string, string[]>>({})
   return (
     <>
-      <Terminal id={deploy.id} selected={selected}></Terminal>
+      <Terminal
+        {...{
+          id: deploy.id,
+          selected: selected,
+          log: log,
+          setLog: setLog
+        }}
+      ></Terminal>
       <div className="world-box">
         <TopNav
           selected={selected}

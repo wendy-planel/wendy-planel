@@ -1,4 +1,3 @@
-import { produce } from "immer"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import "./styles/plane.css"
@@ -8,30 +7,12 @@ import { Console } from "../../api/console"
 interface TerminalProps {
   id: number
   selected: number
+  log: Record<string, string[]>
+  setLog: React.Dispatch<React.SetStateAction<Record<string, string[]>>>
 }
 export function Terminal(props: TerminalProps) {
   const { id, selected } = props
   const [real, setReal] = useState<boolean>(true)
-  const [log, setLog] = useState<string[]>([])
-  const ref = useRef<HTMLDivElement | null>(null)
-  useEffect(() => {
-    const key = `${id}_${selected}`
-    const handleNewLog = (message: string) => {
-      setLog((prevLog) => {
-        const newLog = [...prevLog, message]
-        return newLog.slice(-1000)
-      })
-    }
-    event.on(key, handleNewLog)
-    return () => {
-      event.off(key, handleNewLog)
-    }
-  }, [id, selected])
-  useEffect(() => {
-    if (ref && ref.current) {
-      ref.current.scrollTop = ref.current.scrollHeight
-    }
-  }, [log])
   return (
     <>
       <div className="terminal-box">
@@ -55,11 +36,7 @@ export function Terminal(props: TerminalProps) {
             历史日志
           </div>
         </div>
-        {real ? (
-          <RealTimeLog id={id} selected={selected}></RealTimeLog>
-        ) : (
-          <HistoryLog id={id} selected={selected}></HistoryLog>
-        )}
+        {real ? <RealTimeLog {...props}></RealTimeLog> : <HistoryLog id={id} selected={selected}></HistoryLog>}
       </div>
       <Command id={id} selected={selected}></Command>
     </>
@@ -67,42 +44,43 @@ export function Terminal(props: TerminalProps) {
 }
 
 function RealTimeLog(props: TerminalProps) {
-  const { id, selected } = props
-  const [log, setLog] = useState<Record<string, string[]>>({})
+  const { id, selected, log, setLog } = props
   const ref = useRef<HTMLDivElement | null>(null)
+  const key = `log_${id}_${selected}`
   useEffect(() => {
-    const key = `${id}_${selected}`
     const handleNewLog = (message: string) => {
-      setLog(
-        produce((draft) => {
-          const _log = draft[key] || []
-          _log.push(message)
-          draft[key] = _log.slice(-1000)
-        })
-      )
+      setLog((prevLog) => {
+        const currentLog = prevLog[key] || []
+        return {
+          ...prevLog,
+          [key]: [...currentLog, message].slice(-1000)
+        }
+      })
     }
     event.on(key, handleNewLog)
     return () => {
       event.off(key, handleNewLog)
     }
-  }, [id, selected])
+  }, [key])
   useEffect(() => {
-    if (ref && ref.current) {
+    if (ref.current) {
       ref.current.scrollTop = ref.current.scrollHeight
     }
-  }, [log, selected])
+  }, [key, log])
   return (
     <div className="terminal-outer">
       <div className="terminal" ref={ref}>
-        {log[`${id}_${selected}`]?.map((line, index) => {
-          return <div key={index}>{line}</div>
-        })}
+        {log[key]?.map((line, index) => <div key={index}>{line}</div>)}
       </div>
     </div>
   )
 }
 
-function HistoryLog(props: TerminalProps) {
+interface HistoryLogProps {
+  id: number
+  selected: number
+}
+function HistoryLog(props: HistoryLogProps) {
   const { id, selected } = props
   const [log, setLog] = useState<string[]>([])
   const ref = useRef<HTMLDivElement | null>(null)
@@ -134,7 +112,11 @@ function HistoryLog(props: TerminalProps) {
   )
 }
 
-function Command(props: TerminalProps) {
+interface CommandProps {
+  id: number
+  selected: number
+}
+function Command(props: CommandProps) {
   const { id, selected } = props
   const run_command = async (command: string) => {
     await Console.command(id, {
