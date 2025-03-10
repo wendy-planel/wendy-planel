@@ -40,5 +40,5 @@ export const Deploy = {
   download: download,
   stop: stop,
   restart: restart,
-  create: create,
+  create: create
 }

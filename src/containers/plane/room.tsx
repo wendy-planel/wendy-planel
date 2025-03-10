@@ -9,27 +9,25 @@ import { Deploy as DeploySchema } from "../../common/interface"
 import { extractFirstValidIP, isPublicIP } from "../../common/tools/ip"
 import { LoadIcon, StopIcon, CopyIcon, LaunchIcon, ClickCopyIcon } from "../../common/svg"
 
-
 async function copyToClipboard(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
     return await navigator.clipboard.writeText(text)
   } else {
-    let textarea = document.createElement('textarea')
-    textarea.style.position = 'fixed'
-    textarea.style.top = '-10000px'
-    textarea.style.zIndex = '-999'
+    let textarea = document.createElement("textarea")
+    textarea.style.position = "fixed"
+    textarea.style.top = "-10000px"
+    textarea.style.zIndex = "-999"
     try {
       document.body.appendChild(textarea)
       textarea.value = text
       textarea.focus()
       textarea.select()
-      document.execCommand('copy')
+      document.execCommand("copy")
     } finally {
       document.body.removeChild(textarea)
     }
   }
 }
-
 
 function getConnection(deploy: DeploySchema) {
   const password = deploy.cluster.ini.cluster_password
@@ -147,7 +145,7 @@ function DeployRoom(props: DeployRoomProps) {
     }, 500)
   }
   const master = deploy.cluster.world.find((e) => e.type === "Master")
-  const caves = deploy.cluster.world.find((e) => e.type === 'Caves')
+  const caves = deploy.cluster.world.find((e) => e.type === "Caves")
   return (
     <div>
       <div className="plane-card-line">
@@ -203,7 +201,7 @@ function DeployRoom(props: DeployRoomProps) {
         森林端口:
         <input
           name="master_server_port"
-          value={(!master || master.server_port == -1) ? "auto" : master?.server_port}
+          value={!master || master.server_port == -1 ? "auto" : master?.server_port}
           onChange={(e) => handlePort("Master", e.target.value)}
         />
       </div>
@@ -211,7 +209,7 @@ function DeployRoom(props: DeployRoomProps) {
         洞穴端口:
         <input
           name="caves_server_port"
-          value={(!caves || caves.server_port === -1) ? "auto" : caves?.server_port}
+          value={!caves || caves.server_port === -1 ? "auto" : caves?.server_port}
           onChange={(e) => handlePort("Caves", e.target.value)}
         />
       </div>
@@ -362,7 +360,7 @@ function ButtonBox(props: ButtonBoxProps) {
   const [states, setStates] = useState<ButtonBoxStates>({
     deleting: false,
     downloading: false,
-    deploying: false,
+    deploying: false
   })
 
   async function handleShare() {

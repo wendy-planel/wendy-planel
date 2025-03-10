@@ -81,7 +81,7 @@ function Upload(props: TopNavProps) {
             setVisible(false)
             if (response.ok) {
               const item = (await response.json()) as DeploySchema
-              setDeploy([{...item, _show: true}, ...deploy])
+              setDeploy([{ ...item, _show: true }, ...deploy])
             }
             scrollTop()
           }
@@ -97,7 +97,7 @@ function Create(props: TopNavProps) {
     <div
       onClick={async () => {
         const item = await DeployAPI.create(DeployCreateDefault)
-        setDeploy([{...item, _show: true}, ...deploy])
+        setDeploy([{ ...item, _show: true }, ...deploy])
         scrollTop()
       }}
       className="top-nav-button"
@@ -119,11 +119,11 @@ function Search(props: TopNavProps) {
           if (keyword) {
             for (const item of deploy) {
               const show = item.cluster.ini.cluster_name.toLowerCase().includes(keyword.toLowerCase())
-              _deploy.push({...item, _show: show})
+              _deploy.push({ ...item, _show: show })
             }
           } else {
             for (const item of deploy) {
-              _deploy.push({...item, _show: true})
+              _deploy.push({ ...item, _show: true })
             }
           }
           setDeploy(_deploy)

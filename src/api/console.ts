@@ -20,5 +20,5 @@ async function command(id: number, body: CommandBody): Promise<string> {
 
 export const Console = {
   tail: tail,
-  command: command,
+  command: command
 }
