@@ -314,10 +314,6 @@ function SystemInfo(props: SystemInfoProps) {
       const memoryUsage = message.memory_stats.usage
       const memoryLimit = message.memory_stats.limit
       if (systemCpuUsage || memoryLimit) {
-        console.log({
-          cpu: ((totalCpuUsage / systemCpuUsage) * 100).toFixed(2),
-          memory: ((memoryUsage / memoryLimit) * 100).toFixed(2)
-        })
         setStats({
           cpu: ((totalCpuUsage / systemCpuUsage) * 100).toFixed(2),
           memory: ((memoryUsage / memoryLimit) * 100).toFixed(2)
