@@ -276,7 +276,7 @@ interface Stats {
   cpu: string
   memory: string
 }
-interface LogMessage {
+interface StatsMessage {
   cpu_stats: {
     cpu_usage: {
       total_usage: number
@@ -306,7 +306,7 @@ function SystemInfo(props: SystemInfoProps) {
   const { deploy, selected } = props
   const key = `stats_${deploy.id}_${selected}`
   useEffect(() => {
-    const handleNewLog = (message: LogMessage) => {
+    const handleNewLog = (message: StatsMessage) => {
       const cpuStats = message.cpu_stats
       const preCpuStats = message.precpu_stats
       const totalCpuUsage = cpuStats.cpu_usage.total_usage - preCpuStats.cpu_usage.total_usage
