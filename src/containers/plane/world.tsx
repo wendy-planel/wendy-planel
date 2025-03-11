@@ -11,12 +11,13 @@ import { CavesDefault, MasterDefault, WorldOverrides } from "../../common/consta
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
 
 interface WorldProps {
+  selected: number
   deploy: DeploySchema
+  setSelected: React.Dispatch<React.SetStateAction<number>>
   setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 export function World(props: WorldProps) {
-  const { deploy, setDeploy } = props
-  const [selected, setSelected] = useState<number>(0)
+  const { deploy, setDeploy, selected, setSelected } = props
   const [log, setLog] = useState<Record<string, string[]>>({})
   return (
     <>

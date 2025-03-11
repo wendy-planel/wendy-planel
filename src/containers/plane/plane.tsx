@@ -37,16 +37,23 @@ export function Plane() {
   useEffect(() => {
     loadData()
     const since = Math.floor(Date.now() / 1000) - 1800
-    const source = new EventSource(`${HOST}/console/logs/follow?since=${since}`)
-    source.onmessage = (message) => {
-      const { key, data } = JSON.parse(message.data)
-      event.emit(key, data)
-    }
-    source.onerror = () => {
-      source.close()
+    const sources = [
+      new EventSource(`${HOST}/console/logs/follow?since=${since}`),
+      new EventSource(`${HOST}/stats?interval=5`)
+    ]
+    for (const source of sources) {
+      source.onmessage = (message) => {
+        const { key, data } = JSON.parse(message.data)
+        event.emit(key, data)
+      }
+      source.onerror = () => {
+        source.close()
+      }
     }
     return () => {
-      source.close()
+      for (const source of sources) {
+        source.close()
+      }
     }
   }, [loadData])
   const visibleDeploy = useMemo(() => deploy.filter((item) => item._show), [deploy])

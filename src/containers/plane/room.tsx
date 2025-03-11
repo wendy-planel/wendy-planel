@@ -1,8 +1,9 @@
 import { produce } from "immer"
 import { saveAs } from "file-saver"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import "./styles/plane.css"
+import { event } from "../../common/bus"
 import { Deploy as DeployAPI } from "../../api"
 import { HoverTip } from "../../components/tips"
 import { Deploy as DeploySchema } from "../../common/interface"
@@ -269,14 +270,27 @@ function DeployRoom(props: DeployRoomProps) {
 interface Stats {
   cpu: number
   memory: number
-  read: string
-  status: "running" | "pending" | "stop"
 }
 interface SystemInfoProps {
-  stats: Stats
+  selected: number
+  deploy: DeploySchema
 }
 function SystemInfo(props: SystemInfoProps) {
-  const { stats } = props
+  const [stats, setStats] = useState<Stats>({
+    cpu: 1,
+    memory: 1
+  })
+  const { deploy, selected } = props
+  const key = `stats_${deploy.id}_${selected}`
+  useEffect(() => {
+    const handleNewLog = (message: Object) => {
+      console.log(message)
+    }
+    event.on(key, handleNewLog)
+    return () => {
+      event.off(key, handleNewLog)
+    }
+  }, [key])
   return (
     <div className="stats-box">
       <div className="stats-box-item">
@@ -296,8 +310,8 @@ function SystemInfo(props: SystemInfoProps) {
         <div className="stats-box-text">{stats.memory}%</div>
       </div>
       <div className="stats-box-item">
-        <div className="stats-box-text">{stats.status == "running" ? "运行中" : "已停止"}</div>
-        <svg viewBox="0 0 1024 1024" width="18" height="18" fill={stats.status == "running" ? "#00ff00" : "#ff0000"}>
+        <div className="stats-box-text">{deploy.status == "running" ? "运行中" : "已停止"}</div>
+        <svg viewBox="0 0 1024 1024" width="18" height="18" fill={deploy.status == "running" ? "#00ff00" : "#ff0000"}>
           <path d="M514.048 128q79.872 0 149.504 30.208t121.856 82.432 82.432 122.368 30.208 150.016q0 78.848-30.208 148.48t-82.432 121.856-121.856 82.432-149.504 30.208-149.504-30.208-121.856-82.432-82.432-121.856-30.208-148.48q0-79.872 30.208-150.016t82.432-122.368 121.856-82.432 149.504-30.208z"></path>
         </svg>
       </div>
@@ -498,22 +512,17 @@ function ButtonBox(props: ButtonBoxProps) {
 }
 
 interface RoomProps {
+  selected: number
   deploy: DeploySchema
   onDelete: (id: number) => void
   setDeploy: React.Dispatch<React.SetStateAction<DeploySchema>>
 }
 export function Room(props: RoomProps) {
-  const { deploy, onDelete, setDeploy } = props
-  const stats = {
-    cpu: 18.09,
-    memory: 40.23,
-    read: "2015-01-08T22:57:31.547920715Z",
-    status: deploy.status
-  }
+  const { selected, deploy, onDelete, setDeploy } = props
   return (
     <div className="plane-card-room">
       <DeployRoom deploy={deploy} setDeploy={setDeploy}></DeployRoom>
-      <SystemInfo stats={stats}></SystemInfo>
+      <SystemInfo {...{ deploy: deploy, selected: selected }}></SystemInfo>
       <ButtonBox deploy={deploy} setDeploy={setDeploy} onDelete={onDelete}></ButtonBox>
     </div>
   )

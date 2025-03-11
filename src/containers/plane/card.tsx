@@ -12,11 +12,19 @@ interface CardProps {
 }
 export function Card(props: CardProps) {
   const [deploy, setDeploy] = useState<DeploySchema>(props.deploy)
+  const [selected, setSelected] = useState<number>(0)
   return (
     <div className="plane-card">
-      <Room deploy={deploy} onDelete={props.onDelete} setDeploy={setDeploy}></Room>
-      <ModBox deploy={deploy} setDeploy={setDeploy}></ModBox>
-      <World deploy={deploy} setDeploy={setDeploy}></World>
+      <Room
+        {...{
+          deploy: deploy,
+          onDelete: props.onDelete,
+          setDeploy: setDeploy,
+          selected: selected
+        }}
+      ></Room>
+      <ModBox {...{ deploy: deploy, setDeploy: setDeploy }}></ModBox>
+      <World {...{ deploy: deploy, setDeploy: setDeploy, selected: selected, setSelected: setSelected }}></World>
     </div>
   )
 }
