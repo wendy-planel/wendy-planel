@@ -68,6 +68,8 @@ function DeployRoom(props: DeployRoomProps) {
           if (item.type === type && flag) {
             world.push({ ...item, server_port: parseInt(port) })
             flag = false
+          } else {
+            world.push({ ...item })
           }
         }
         draft.cluster.world = world
@@ -193,24 +195,27 @@ function DeployRoom(props: DeployRoomProps) {
       <div className="plane-card-line">
         主机端口:
         <input
+          type="number"
           name="master_ip"
-          value={deploy.cluster.ini.master_port == -1 ? "auto" : deploy.cluster.ini.master_port}
+          value={deploy.cluster.ini.master_port == -1 ? 10000 + deploy.id * 100 : deploy.cluster.ini.master_port}
           onChange={(e) => handleClusterIniMasterPort(e.target.value)}
         />
       </div>
       <div className="plane-card-line">
         森林端口:
         <input
+          type="number"
           name="master_server_port"
-          value={!master || master.server_port == -1 ? "auto" : master?.server_port}
+          value={!master || master.server_port == -1 ? 10001 + deploy.id * 100 : master?.server_port}
           onChange={(e) => handlePort("Master", e.target.value)}
         />
       </div>
       <div className="plane-card-line">
         洞穴端口:
         <input
+          type="number"
           name="caves_server_port"
-          value={!caves || caves.server_port === -1 ? "auto" : caves?.server_port}
+          value={!caves || caves.server_port === -1 ? 10002 + deploy.id * 100 : caves?.server_port}
           onChange={(e) => handlePort("Caves", e.target.value)}
         />
       </div>
@@ -268,8 +273,26 @@ function DeployRoom(props: DeployRoomProps) {
 }
 
 interface Stats {
-  cpu: number
-  memory: number
+  cpu: string
+  memory: string
+}
+interface LogMessage {
+  cpu_stats: {
+    cpu_usage: {
+      total_usage: number
+    }
+    system_cpu_usage: number
+  }
+  precpu_stats: {
+    cpu_usage: {
+      total_usage: number
+    }
+    system_cpu_usage: number
+  }
+  memory_stats: {
+    usage: number
+    limit: number
+  }
 }
 interface SystemInfoProps {
   selected: number
@@ -277,14 +300,29 @@ interface SystemInfoProps {
 }
 function SystemInfo(props: SystemInfoProps) {
   const [stats, setStats] = useState<Stats>({
-    cpu: 1,
-    memory: 1
+    cpu: "...",
+    memory: "..."
   })
   const { deploy, selected } = props
   const key = `stats_${deploy.id}_${selected}`
   useEffect(() => {
-    const handleNewLog = (message: Object) => {
-      console.log(message)
+    const handleNewLog = (message: LogMessage) => {
+      const cpuStats = message.cpu_stats
+      const preCpuStats = message.precpu_stats
+      const totalCpuUsage = cpuStats.cpu_usage.total_usage - preCpuStats.cpu_usage.total_usage
+      const systemCpuUsage = cpuStats.system_cpu_usage - preCpuStats.system_cpu_usage
+      const memoryUsage = message.memory_stats.usage
+      const memoryLimit = message.memory_stats.limit
+      if (systemCpuUsage || memoryLimit) {
+        console.log({
+          cpu: ((totalCpuUsage / systemCpuUsage) * 100).toFixed(2),
+          memory: ((memoryUsage / memoryLimit) * 100).toFixed(2)
+        })
+        setStats({
+          cpu: ((totalCpuUsage / systemCpuUsage) * 100).toFixed(2),
+          memory: ((memoryUsage / memoryLimit) * 100).toFixed(2)
+        })
+      }
     }
     event.on(key, handleNewLog)
     return () => {
@@ -299,7 +337,7 @@ function SystemInfo(props: SystemInfoProps) {
             <path d="M906.26 398 906.26 337.2l-72.1 0.2 0-94.3c0-23.9-12.3-37.3-36.2-37.3l-86.9 0 0-73.8-61.5 0 0 73.8-92.4 0L557.16 132l-61.5 0-0.1 73.8L403.16 205.8l0.2-73.8-61.8 0 0.1 73.8-80.9 0c-29.7 0-41.9 13.4-41.7 44.4l-0.6 87.2-73.4 0L145.06 398l73.4 0 0 84.9-73.4-0.1 0 61.5 73.4 0.2 0 86.2-73.4 0 0 60.4 73.4 0 0 82.4c0 34 13.7 48.1 47.8 48.1l75.4 0-0.1 70.8 61.4 0 0.3-70.8 92.4 0 0 70.8 61.7 0-0.1-70.8 92.4 0-0.2 70.8 61.7 0 0.1-70.8 82.3 0c27.6 0 40.8-24.3 40.8-48.1l0-82.4 72.1 0 0-60.4L834.16 630.7l0-86.2 72.1 0 0-61.4-72.1-0.2L834.16 398 906.26 398zM772.56 760 280.06 760 280.06 267.4l492.6 0L772.66 760zM382.96 682.3l295.8 0c11.8 0 16.1-8.1 16.1-18.8L694.86 367c0-12.6-8.6-19.6-18.8-19.6L379.86 347.4c-15.4 0-19.9 5.7-19.9 21.2l0 290.6C359.96 674.6 367.56 682.3 382.96 682.3z"></path>
           </svg>
         </HoverTip>
-        <div className="stats-box-text">{stats.cpu}%</div>
+        <div className="stats-box-text">{deploy.status === "running" ? stats.cpu : "~"}%</div>
       </div>
       <div className="stats-box-item">
         <HoverTip tip="内存">
@@ -307,7 +345,7 @@ function SystemInfo(props: SystemInfoProps) {
             <path d="M922.688 810.624h-149.312a37.376 37.376 0 0 1-37.312-37.376L736 736h-49.792v74.688H611.584V736h-49.792v74.688H462.208V736h-49.728v74.688H337.792V736H288l-0.256 37.248a37.312 37.312 0 0 1-37.312 37.376h-149.12A37.312 37.312 0 0 1 64 773.248V250.752c0-20.672 16.704-37.376 37.312-37.376h821.312a37.312 37.312 0 0 1 37.376 37.376v522.496a37.312 37.312 0 0 1-37.312 37.376z m-37.376-177.344h-39.168a37.376 37.376 0 0 1 0-74.752h39.168V288.128H138.688v270.4h37.952a37.376 37.376 0 0 1 0 74.752h-37.952v102.528H213.12l0.256-49.6c0-20.672 4.288-24.896 24.896-24.896h547.584c20.608 0 24.896 4.224 24.896 24.896v49.6h74.624V633.28zM736 337.792h74.688V512H736V337.792z m-174.208 0h74.688V512H561.792V337.792z m-174.208 0h74.688V512H387.584V337.792z m-174.272 0H288V512l-73.472-0.128-1.216-174.08z"></path>
           </svg>
         </HoverTip>
-        <div className="stats-box-text">{stats.memory}%</div>
+        <div className="stats-box-text">{deploy.status === "running" ? stats.memory : "~"}%</div>
       </div>
       <div className="stats-box-item">
         <div className="stats-box-text">{deploy.status == "running" ? "运行中" : "已停止"}</div>
@@ -502,7 +540,7 @@ function ButtonBox(props: ButtonBoxProps) {
       <Button
         tip={deploy.status == "running" ? "停止" : "启动"}
         load={states.deploying}
-        load_tip={deploy.status == "running" ? "启动中" : "停止中"}
+        load_tip={deploy.status === "running" ? "停止中" : "启动中"}
         onClick={clickRun}
       >
         <path d={deploy.status == "running" ? StopIcon : LaunchIcon}></path>

@@ -17,7 +17,7 @@ export function Plane() {
       .map((item) => ({ ...item, _show: true }))
       .sort((a, b) => {
         if (a.status === b.status) {
-          return new Date(b.updated_at) < new Date(a.updated_at) ? 1 : -1
+          return new Date(b.updated_at) < new Date(a.updated_at) ? -1 : 1
         } else {
           return a.status !== "running" && b.status === "running" ? 1 : -1
         }
