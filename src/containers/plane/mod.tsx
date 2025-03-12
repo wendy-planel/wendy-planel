@@ -11,21 +11,20 @@ import { Configuration, PublishedFileDetail, ConfigurationOption, Deploy as Depl
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
 
 interface ModBoxContent {
-  pick: PublishedFileDetail[]
   search: PublishedFileDetail[]
   state?: "searching" | "parsing" | undefined
 }
 
 interface ModConfigEditProps {
-  content: ModBoxContent
   mod: PublishedFileDetail
+  checked_mods: PublishedFileDetail[]
   setEdit: React.Dispatch<React.SetStateAction<boolean>>
-  setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>
+  setCheckedMods: React.Dispatch<React.SetStateAction<PublishedFileDetail[]>>
 }
 function ModConfigEdit(props: ModConfigEditProps) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [options, setOptions] = useState<ConfigurationOption[]>([])
-  const { content, mod, setEdit, setContent } = props
+  const { mod, setEdit, checked_mods, setCheckedMods } = props
   const onUpdate = async (option: ConfigurationOption, offset: number) => {
     const _options = []
     for (const item of options) {
@@ -37,12 +36,12 @@ function ModConfigEdit(props: ModConfigEditProps) {
         } else if (selected >= option.options.length) {
           selected = 0
         }
-        const pick: PublishedFileDetail[] = []
-        for (const pick_mod of content.pick) {
-          if (pick_mod.publishedfileid === mod.publishedfileid) {
-            const configuration = pick_mod.configuration?.configuration_options || {}
-            pick.push({
-              ...pick_mod,
+        const next_checked_mods: PublishedFileDetail[] = []
+        for (const checked_mod of checked_mods) {
+          if (checked_mod.publishedfileid === mod.publishedfileid) {
+            const configuration = checked_mod.configuration?.configuration_options || {}
+            next_checked_mods.push({
+              ...checked_mod,
               configuration: {
                 enabled: true,
                 configuration_options: {
@@ -52,14 +51,10 @@ function ModConfigEdit(props: ModConfigEditProps) {
               }
             })
           } else {
-            pick.push(pick_mod)
+            next_checked_mods.push(checked_mod)
           }
         }
-        setContent(
-          produce((draft) => {
-            draft.pick = pick
-          })
-        )
+        setCheckedMods(next_checked_mods)
       }
       _options.push({ ...item, selected: selected })
       setOptions(_options)
@@ -133,23 +128,20 @@ interface ModProps {
   mode?: "add"
   content: ModBoxContent
   mod: PublishedFileDetail
+  checked_mods: PublishedFileDetail[]
   setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>
+  setCheckedMods: React.Dispatch<React.SetStateAction<PublishedFileDetail[]>>
 }
 function Mod(props: ModProps) {
-  const { mode, content, mod, setContent } = props
+  const { mode, content, mod, setContent, checked_mods, setCheckedMods } = props
   const [adding, setAdding] = useState<boolean>(false)
   const [edit, setEdit] = useState<boolean>(false)
   const onDelete = async () => {
-    const pick = content.pick.filter((e) => e.publishedfileid !== mod.publishedfileid)
-    setContent(
-      produce((draft) => {
-        draft.pick = pick
-      })
-    )
+    setCheckedMods(checked_mods.filter((e) => e.publishedfileid !== mod.publishedfileid))
   }
   const onAdd = async () => {
     const search = content.search.filter((e) => e.publishedfileid !== mod.publishedfileid)
-    const pick = content.pick.filter((e) => e.publishedfileid !== mod.publishedfileid)
+    const next_checked_mods = checked_mods.filter((e) => e.publishedfileid !== mod.publishedfileid)
     setAdding(true)
     try {
       const config = await ModAPI.readConfig([mod.publishedfileid])
@@ -166,7 +158,7 @@ function Mod(props: ModProps) {
             configuration.configuration_options[item.name] = item.default
           }
         }
-        pick.push({
+        next_checked_mods.push({
           ...mod,
           code: config[0].code,
           configuration: configuration,
@@ -174,10 +166,10 @@ function Mod(props: ModProps) {
         })
         setContent(
           produce((draft) => {
-            draft.pick = pick
             draft.search = search
           })
         )
+        setCheckedMods(next_checked_mods)
       }
     } finally {
       setAdding(false)
@@ -243,11 +235,15 @@ function Mod(props: ModProps) {
       </div>
       {edit && (
         <ModConfigEdit
-          key={mod.publishedfileid}
-          content={content}
-          mod={mod}
-          setContent={setContent}
-          setEdit={setEdit}
+          {...{
+            key: mod.publishedfileid,
+            mod: mod,
+            setEdit: setEdit,
+            content: content,
+            setContent: setContent,
+            checked_mods: checked_mods,
+            setCheckedMods: setCheckedMods
+          }}
         />
       )}
     </div>
@@ -256,13 +252,15 @@ function Mod(props: ModProps) {
 
 interface SearchModProps {
   content: ModBoxContent
+  checked_mods: PublishedFileDetail[]
   setContent: React.Dispatch<React.SetStateAction<ModBoxContent>>
+  setCheckedMods: React.Dispatch<React.SetStateAction<PublishedFileDetail[]>>
 }
 function SearchMod(props: SearchModProps) {
-  const { content, setContent } = props
+  const { content, setContent, checked_mods, setCheckedMods } = props
   const [key, setKey] = useState<string>("")
   const mods: string[] = []
-  content.pick.forEach((e) => mods.push(e.publishedfileid))
+  checked_mods.forEach((e) => mods.push(e.publishedfileid))
   async function handleSearch() {
     if (key === "") {
       setContent(
@@ -332,7 +330,19 @@ function SearchMod(props: SearchModProps) {
       {content.search.length > 0 && content.state !== "searching" && (
         <div className="mod-box-search">
           {content.search?.map(function (item, index) {
-            return <Mod key={index} mode="add" mod={item} content={content} setContent={setContent}></Mod>
+            return (
+              <Mod
+                key={index}
+                {...{
+                  mode: "add",
+                  mod: item,
+                  content: content,
+                  setContent: setContent,
+                  checked_mods: checked_mods,
+                  setCheckedMods: setCheckedMods
+                }}
+              ></Mod>
+            )
           })}
         </div>
       )}
@@ -346,47 +356,50 @@ interface ModBoxProps {
 }
 export function ModBox(props: ModBoxProps) {
   const { deploy, setDeploy } = props
-  const [content, setContent] = useState<ModBoxContent>({
-    pick: [],
-    search: []
-  })
+  const [content, setContent] = useState<ModBoxContent>({ search: [] })
+  const [checked_mods, setCheckedMods] = useState<PublishedFileDetail[]>([])
   async function loadData() {
-    const mods: string[] = []
     if (deploy.cluster.world) {
-      const regex = /workshop-([0-9]+)/g
-      let match
-      while ((match = regex.exec(deploy.cluster.world[0].modoverrides)) !== null) {
-        mods.push(match[1])
-      }
-    }
-    if (mods.length > 0) {
-      setContent(
-        produce((draft) => {
-          draft.state = "parsing"
-        })
-      )
       const lua = await factory.createEngine()
-      const modoverrides = deploy.cluster.world[0].modoverrides
-      const modconfig = await lua.doString(modoverrides)
-      const pick = await ModAPI.read(mods)
-      const pick_config = await ModAPI.readConfig(mods)
       try {
-        for (let i = 0; i < pick.length; i++) {
-          const config = pick_config.find((e) => e.id == pick[i].publishedfileid)
-          if (config) {
-            pick[i].code = config.code
-            await lua.doString(config.code)
-            pick[i].configuration_options = lua.global.get("configuration_options") || []
-            pick[i].configuration = modconfig[`workshop-${pick[i].publishedfileid}`]
+        const mods: string[] = []
+        const modoverrides = deploy.cluster.world[0].modoverrides
+        const modconfig = await lua.doString(modoverrides)
+        for (const workshop of Object.keys(modconfig)) {
+          const match = workshop.match(/workshop-(\d+)/)
+          const mod_id = match ? match[1] : null
+          if (mod_id) {
+            mods.push(mod_id)
           }
         }
+        if (mods.length > 0) {
+          const checked = await ModAPI.read(mods)
+          const mods_config = await ModAPI.readConfig(mods)
+          for (let i = 0; i < checked.length; i++) {
+            const config = mods_config.find((e) => e.id == checked[i].publishedfileid)
+            if (config) {
+              checked[i].code = config.code
+              try {
+                await lua.doString(config.code)
+                checked[i].configuration_options = lua.global.get("configuration_options") || []
+                checked[i].configuration = modconfig[`workshop-${checked[i].publishedfileid}`]
+              } catch (error) {
+                console.log(config.code)
+                console.log(error)
+              }
+            }
+          }
+          setCheckedMods(checked)
+        }
+      } catch (error) {
+        console.log(error)
+        console.log(deploy.cluster.world[0].modoverrides)
       } finally {
         lua.global.close()
       }
       setContent(
         produce((draft) => {
           draft.state = undefined
-          draft.pick = pick
         })
       )
     }
@@ -395,17 +408,17 @@ export function ModBox(props: ModBoxProps) {
     loadData()
   }, [])
   useEffect(() => {
-    const pick_configuration = []
-    for (const mod of content.pick) {
+    const checked_configuration = []
+    for (const mod of checked_mods) {
       if (mod.configuration !== undefined) {
-        pick_configuration.push({
+        checked_configuration.push({
           id: mod.publishedfileid,
           configuration: mod.configuration
         })
       }
     }
     let modoverrides = "return {"
-    for (const modconfig of pick_configuration) {
+    for (const modconfig of checked_configuration) {
       modoverrides += `["workshop-${modconfig.id}"]={\n`
       modoverrides += "configuration_options={\n"
       const config = modconfig.configuration.configuration_options
@@ -423,7 +436,9 @@ export function ModBox(props: ModBoxProps) {
         } else {
           luaValue = "nil"
         }
-        modoverrides += `  ${key} = ${luaValue},\n`
+        if (key) {
+          modoverrides += `  ${key} = ${luaValue},\n`
+        }
       }
       modoverrides += "},\n"
       modoverrides += "enabled=true"
@@ -437,10 +452,12 @@ export function ModBox(props: ModBoxProps) {
         }
       })
     )
-  }, [content.pick])
+  }, [checked_mods])
   return (
     <div className="mod-box">
-      <SearchMod content={content} setContent={setContent}></SearchMod>
+      <SearchMod
+        {...{ content: content, setContent: setContent, checked_mods: checked_mods, setCheckedMods: setCheckedMods }}
+      ></SearchMod>
       <div className="mod-box-separation-line"></div>
       <div
         className="mod-box-added"
@@ -467,8 +484,19 @@ export function ModBox(props: ModBoxProps) {
             </HoverTip>
           </div>
         ) : (
-          content.pick?.map(function (item, index) {
-            return <Mod key={index} mod={item} content={content} setContent={setContent}></Mod>
+          checked_mods?.map(function (item, index) {
+            return (
+              <Mod
+                key={index}
+                {...{
+                  mod: item,
+                  content: content,
+                  setContent: setContent,
+                  checked_mods: checked_mods,
+                  setCheckedMods: setCheckedMods
+                }}
+              ></Mod>
+            )
           })
         )}
       </div>
