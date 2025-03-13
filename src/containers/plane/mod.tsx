@@ -69,9 +69,6 @@ function ModConfigEdit(props: ModConfigEditProps) {
   useEffect(() => {
     const configuration_options = []
     for (const item of mod.configuration_options || []) {
-      if (!("default" in item)) {
-        continue
-      }
       let selected = 0
       if (item.name in configuration) {
         let index = -1
@@ -83,10 +80,7 @@ function ModConfigEdit(props: ModConfigEditProps) {
           }
         }
       }
-      const e = configuration_options.find((t) => t.name == item.name)
-      if (item.label && e === undefined && item.options.length > 0) {
-        configuration_options.push({ ...item, selected: selected })
-      }
+      configuration_options.push({ ...item, selected: selected })
     }
     setOptions(configuration_options)
     document.addEventListener("mousedown", handleClickOutside)
@@ -102,7 +96,7 @@ function ModConfigEdit(props: ModConfigEditProps) {
         {options.map((item, index) => {
           return (
             <div key={index} className="mod-config-edit-item">
-              <div className="mod-config-label">{item.label}</div>
+              <div className="mod-config-label">{item.label || item.name}</div>
               <div className="mod-config-button" onClick={() => onUpdate(item, -1)}>
                 <svg viewBox="0 0 1024 1024" width="20" height="20" fill="#3498db">
                   <path d="M734.165333 97.834667a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010666L380.416 512l353.749333 353.749333a42.666667 42.666667 0 0 1 3.541334 56.32l-3.541334 4.010667a42.666667 42.666667 0 0 1-56.32 3.584l-4.010666-3.541333-384-384a42.666667 42.666667 0 0 1-3.541334-56.32l3.541334-3.968 384-384a42.666667 42.666667 0 0 1 60.330666 0z"></path>
@@ -154,8 +148,8 @@ function Mod(props: ModProps) {
           configuration_options: {}
         }
         for (const item of configuration_options) {
-          if (item.name) {
-            configuration.configuration_options[item.name] = item.default
+          if (item.hasOwnProperty('default')) {
+            configuration.configuration_options[`${item.name}`] = item.default
           }
         }
         next_checked_mods.push({
@@ -235,8 +229,8 @@ function Mod(props: ModProps) {
       </div>
       {edit && (
         <ModConfigEdit
+          key={mod.publishedfileid}
           {...{
-            key: mod.publishedfileid,
             mod: mod,
             setEdit: setEdit,
             content: content,
@@ -409,7 +403,7 @@ export function ModBox(props: ModBoxProps) {
     }
   }
   async function rewrite() {
-    if (init) {
+    if (init.current) {
       init.current = false
       return
     }
@@ -442,7 +436,7 @@ export function ModBox(props: ModBoxProps) {
           luaValue = "nil"
         }
         if (key) {
-          modoverrides += `  ${key} = ${luaValue},\n`
+          modoverrides += `  ["${key}"] = ${luaValue},\n`
         }
       }
       modoverrides += "},\n"
