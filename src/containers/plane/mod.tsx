@@ -356,11 +356,17 @@ interface ModBoxProps {
 }
 export function ModBox(props: ModBoxProps) {
   const { deploy, setDeploy } = props
+  const init = useRef<boolean>(true)
   const [content, setContent] = useState<ModBoxContent>({ search: [] })
   const [checked_mods, setCheckedMods] = useState<PublishedFileDetail[]>([])
   async function loadData() {
     if (deploy.cluster.world) {
       const lua = await factory.createEngine()
+      setContent(
+        produce((draft) => {
+          draft.state = "parsing"
+        })
+      )
       try {
         const mods: string[] = []
         const modoverrides = deploy.cluster.world[0].modoverrides
@@ -384,7 +390,6 @@ export function ModBox(props: ModBoxProps) {
                 checked[i].configuration_options = lua.global.get("configuration_options") || []
                 checked[i].configuration = modconfig[`workshop-${checked[i].publishedfileid}`]
               } catch (error) {
-                console.log(config.code)
                 console.log(error)
               }
             }
@@ -393,7 +398,6 @@ export function ModBox(props: ModBoxProps) {
         }
       } catch (error) {
         console.log(error)
-        console.log(deploy.cluster.world[0].modoverrides)
       } finally {
         lua.global.close()
       }
@@ -404,10 +408,11 @@ export function ModBox(props: ModBoxProps) {
       )
     }
   }
-  useEffect(() => {
-    loadData()
-  }, [])
-  useEffect(() => {
+  async function rewrite() {
+    if (init) {
+      init.current = false
+      return
+    }
     const checked_configuration = []
     for (const mod of checked_mods) {
       if (mod.configuration !== undefined) {
@@ -445,13 +450,27 @@ export function ModBox(props: ModBoxProps) {
       modoverrides += "},\n"
     }
     modoverrides += "}"
-    setDeploy(
-      produce((draft) => {
-        for (let i = 0; i < draft.cluster.world.length; i++) {
-          draft.cluster.world[i].modoverrides = modoverrides
-        }
-      })
-    )
+    const lua = await factory.createEngine()
+    try {
+      await lua.doString(modoverrides)
+      setDeploy(
+        produce((draft) => {
+          for (let i = 0; i < draft.cluster.world.length; i++) {
+            draft.cluster.world[i].modoverrides = modoverrides
+          }
+        })
+      )
+    } catch (error) {
+      console.log(error)
+    } finally {
+      lua.global.close()
+    }
+  }
+  useEffect(() => {
+    loadData()
+  }, [])
+  useEffect(() => {
+    rewrite()
   }, [checked_mods])
   return (
     <div className="mod-box">
