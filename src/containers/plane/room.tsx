@@ -479,14 +479,6 @@ function ButtonBox(props: ButtonBoxProps) {
       ...states,
       deploying: true
     })
-    const _deploy = await DeployAPI.update(deploy.id, deploy)
-    setDeploy(
-      produce((draft) => {
-        if (draft.id === _deploy.id) {
-          Object.assign(draft, _deploy)
-        }
-      })
-    )
     if (deploy.status === "running") {
       await DeployAPI.stop(deploy.id)
       setDeploy(
@@ -495,10 +487,12 @@ function ButtonBox(props: ButtonBoxProps) {
         })
       )
     } else {
-      await DeployAPI.restart(deploy.id)
+      const _deploy = await DeployAPI.update(deploy.id, deploy)
       setDeploy(
         produce((draft) => {
-          draft.status = "running"
+          if (draft.id === _deploy.id) {
+            Object.assign(draft, _deploy)
+          }
         })
       )
     }
