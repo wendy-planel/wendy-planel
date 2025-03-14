@@ -350,7 +350,7 @@ interface ModBoxProps {
 }
 export function ModBox(props: ModBoxProps) {
   const { deploy, setDeploy } = props
-  const init = useRef<boolean>(true)
+  const state = useRef({load: false, error: false})
   const [content, setContent] = useState<ModBoxContent>({ search: [] })
   const [checked_mods, setCheckedMods] = useState<PublishedFileDetail[]>([])
   async function loadData() {
@@ -375,23 +375,33 @@ export function ModBox(props: ModBoxProps) {
         if (mods.length > 0) {
           const checked = await ModAPI.read(mods)
           const mods_config = await ModAPI.readConfig(mods)
+          let pass = false
           for (let i = 0; i < checked.length; i++) {
             const config = mods_config.find((e) => e.id == checked[i].publishedfileid)
             if (config) {
               checked[i].code = config.code
               try {
+                pass = false
                 await lua.doString(config.code)
-                checked[i].configuration_options = lua.global.get("configuration_options") || []
-                checked[i].configuration = modconfig[`workshop-${checked[i].publishedfileid}`]
               } catch (error) {
+                pass = true
                 console.log(error)
+                state.current.error = true
+                console.log(checked[i].title)
               }
+              if (pass) {
+                checked[i].configuration_options = []
+              } else {
+                checked[i].configuration_options = lua.global.get("configuration_options") || []
+              }
+              checked[i].configuration = modconfig[`workshop-${checked[i].publishedfileid}`]
             }
           }
           setCheckedMods(checked)
         }
       } catch (error) {
         console.log(error)
+        state.current.error = true
       } finally {
         lua.global.close()
       }
@@ -403,8 +413,11 @@ export function ModBox(props: ModBoxProps) {
     }
   }
   async function rewrite() {
-    if (init.current) {
-      init.current = false
+    if (!state.current.load) {
+      await loadData()
+      state.current.load = true
+    }
+    if (state.current.error) {
       return
     }
     const checked_configuration = []
@@ -460,9 +473,6 @@ export function ModBox(props: ModBoxProps) {
       lua.global.close()
     }
   }
-  useEffect(() => {
-    loadData()
-  }, [])
   useEffect(() => {
     rewrite()
   }, [checked_mods])
