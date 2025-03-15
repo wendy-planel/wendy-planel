@@ -416,6 +416,7 @@ export function ModBox(props: ModBoxProps) {
     if (!state.current.load) {
       await loadData()
       state.current.load = true
+      return
     }
     if (state.current.error) {
       return
