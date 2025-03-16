@@ -126,7 +126,7 @@ function Command(props: CommandProps) {
   }
   return (
     <div className="command-box">
-      <div className="command-item" onClick={() => run_command("c_rollback(3)")}>
+      <div className="command-item" onClick={() => run_command("c_rollback(1)")}>
         回滚1天
       </div>
       <div className="command-item" onClick={() => run_command("c_regenerateshard()")}>
