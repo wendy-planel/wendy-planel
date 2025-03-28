@@ -667,3 +667,8 @@ input::-webkit-inner-spin-button {
   margin-right: 40%;
   text-indent: 1rem;
 }
+
+.nav-top-input:focus {
+  border: none;
+  outline: none;
+}

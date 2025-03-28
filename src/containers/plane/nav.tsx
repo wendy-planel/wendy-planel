@@ -45,9 +45,15 @@ function Upload(props: TopNavProps) {
     <div
       onClick={() => document.getElementById("file-input")?.click()}
       className="top-nav-button"
-      style={{ marginRight: "2rem", minWidth: "5.5rem"}}
+      style={{ marginRight: "2rem", minWidth: "5.5rem" }}
     >
-      <svg fill="#3498db" viewBox="0 0 1024 1024" width="15" height="15" style={{ display: !visible? "none": "block" }}>
+      <svg
+        fill="#3498db"
+        viewBox="0 0 1024 1024"
+        width="15"
+        height="15"
+        style={{ display: !visible ? "none" : "block" }}
+      >
         <path d={LoadIcon}>
           <animateTransform
             attributeType="xml"

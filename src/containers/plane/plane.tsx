@@ -60,7 +60,15 @@ export function Plane() {
   return (
     <div>
       <TopNav deploy={deploy} scrollTop={scrollTop} setDeploy={setDeploy} />
-      <div key="1" className="plane-box" ref={plane}>
+      <div
+        key="1"
+        className="plane-box"
+        ref={plane}
+        style={{
+          transition: "opacity 0.3s ease-in-out",
+          opacity: visibleDeploy.length ? 1 : 0
+        }}
+      >
         {visibleDeploy.map((item) => (
           <Card key={item.id} deploy={item} onDelete={onDelete} />
         ))}
