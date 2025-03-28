@@ -45,23 +45,23 @@ function Upload(props: TopNavProps) {
     <div
       onClick={() => document.getElementById("file-input")?.click()}
       className="top-nav-button"
-      style={{ marginRight: "2rem" }}
+      style={{ marginRight: "2rem", minWidth: "5.5rem"}}
     >
-      {visible && (
-        <svg fill="#3498db" viewBox="0 0 1024 1024" width="15" height="15">
-          <path d={LoadIcon}>
-            <animateTransform
-              attributeType="xml"
-              attributeName="transform"
-              type="rotate"
-              from="0 512 512"
-              to="360 512 512"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </path>
-        </svg>
-      )}
+      <svg fill="#3498db" viewBox="0 0 1024 1024" width="15" height="15" style={{ display: !visible? "none": "block" }}>
+        <path d={LoadIcon}>
+          <animateTransform
+            attributeType="xml"
+            attributeName="transform"
+            type="rotate"
+            from="0 512 512"
+            to="360 512 512"
+            begin="0"
+            dur="1"
+            repeatCount="indefinite"
+            calcMode="linear"
+          />
+        </path>
+      </svg>
       上传存档
       <input
         type="file"
@@ -74,16 +74,20 @@ function Upload(props: TopNavProps) {
             form.append("file", file)
             const api = `${HOST}/deploy/upload`
             setVisible(true)
-            const response = await fetch(api, {
-              method: "POST",
-              body: form
-            })
-            setVisible(false)
-            if (response.ok) {
-              const item = (await response.json()) as DeploySchema
-              setDeploy([{ ...item, _show: true }, ...deploy])
+            try {
+              const response = await fetch(api, {
+                method: "POST",
+                body: form
+              })
+              if (response.ok) {
+                const item = (await response.json()) as DeploySchema
+                setDeploy([{ ...item, _show: true }, ...deploy])
+              }
+              scrollTop()
+            } finally {
+              setVisible(false)
+              e.target.value = ""
             }
-            scrollTop()
           }
         }}
       />

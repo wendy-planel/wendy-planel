@@ -148,7 +148,7 @@ function Mod(props: ModProps) {
           configuration_options: {}
         }
         for (const item of configuration_options) {
-          if (item.hasOwnProperty('default')) {
+          if (item.hasOwnProperty("default")) {
             configuration.configuration_options[`${item.name}`] = item.default
           }
         }
@@ -350,7 +350,7 @@ interface ModBoxProps {
 }
 export function ModBox(props: ModBoxProps) {
   const { deploy, setDeploy } = props
-  const state = useRef({load: false, error: false})
+  const state = useRef({ load: false, error: false })
   const [content, setContent] = useState<ModBoxContent>({ search: [] })
   const [checked_mods, setCheckedMods] = useState<PublishedFileDetail[]>([])
   async function loadData() {
