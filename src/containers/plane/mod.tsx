@@ -6,9 +6,33 @@ import "./styles/plane.css"
 import { Mod as ModAPI } from "../../api"
 import { LoadIcon } from "../../common/svg"
 import { HoverTip } from "../../components/tips"
-import { Configuration, PublishedFileDetail, ConfigurationOption, Deploy as DeploySchema } from "../../common/interface"
+import {
+  Option,
+  Configuration,
+  PublishedFileDetail,
+  ConfigurationOption,
+  Deploy as DeploySchema
+} from "../../common/interface"
 
 const factory = new LuaFactory("/assets/wasm/glue.wasm")
+
+function isOption(obj: any): obj is Option {
+  return obj && typeof obj === "object" && "data" in obj && "description" in obj && typeof obj.description === "string"
+}
+
+export function isConfigurationOption(obj: any): obj is ConfigurationOption {
+  return (
+    obj &&
+    typeof obj === "object" &&
+    Array.isArray(obj.options) &&
+    obj.options.every(isOption) &&
+    typeof obj.label === "string" &&
+    "default" in obj && // default 可以是任意类型
+    typeof obj.hover === "string" &&
+    typeof obj.name === "string" &&
+    (obj.selected === undefined || typeof obj.selected === "number")
+  )
+}
 
 interface ModBoxContent {
   search: PublishedFileDetail[]
@@ -26,7 +50,7 @@ function ModConfigEdit(props: ModConfigEditProps) {
   const [options, setOptions] = useState<ConfigurationOption[]>([])
   const { mod, setEdit, checked_mods, setCheckedMods } = props
   const onUpdate = async (option: ConfigurationOption, offset: number) => {
-    const _options = []
+    const next_options = []
     for (const item of options) {
       let selected = item.selected === undefined ? 0 : item.selected
       if (item.name == option.name) {
@@ -56,9 +80,9 @@ function ModConfigEdit(props: ModConfigEditProps) {
         }
         setCheckedMods(next_checked_mods)
       }
-      _options.push({ ...item, selected: selected })
-      setOptions(_options)
+      next_options.push({ ...item, selected: selected })
     }
+    setOptions(next_options)
   }
   const handleClickOutside = (event: any) => {
     if (boxRef.current && !boxRef.current.contains(event.target)) {
@@ -67,7 +91,7 @@ function ModConfigEdit(props: ModConfigEditProps) {
   }
   const configuration = mod.configuration === undefined ? {} : mod.configuration.configuration_options
   useEffect(() => {
-    const configuration_options = []
+    const next_options = []
     for (const item of mod.configuration_options || []) {
       let selected = 0
       if (item.name in configuration) {
@@ -80,9 +104,12 @@ function ModConfigEdit(props: ModConfigEditProps) {
           }
         }
       }
-      configuration_options.push({ ...item, selected: selected })
+      const next_item = { ...item, selected: selected }
+      if (isConfigurationOption(next_item)) {
+        next_options.push(next_item)
+      }
     }
-    setOptions(configuration_options)
+    setOptions(next_options)
     document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
@@ -483,6 +510,12 @@ export function ModBox(props: ModBoxProps) {
         {...{ content: content, setContent: setContent, checked_mods: checked_mods, setCheckedMods: setCheckedMods }}
       ></SearchMod>
       <div className="mod-box-separation-line"></div>
+      {state.current.error && (
+        <>
+          <div style={{ fontSize: "12px", margin: 0, padding: 0 }}>模组解析错误禁止添加或修改模组</div>
+          <div className="mod-box-separation-line"></div>
+        </>
+      )}
       <div
         className="mod-box-added"
         style={{

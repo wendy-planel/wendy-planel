@@ -63,7 +63,7 @@ export interface Configuration {
   configuration_options: Record<string, any>
 }
 
-interface Option {
+export interface Option {
   data: any
   description: string
 }

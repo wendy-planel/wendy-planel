@@ -14,7 +14,7 @@ export const HoverTip = (props: HoverTipProps) => {
   return (
     <div className="hovertip-container" onMouseEnter={showTip} onMouseLeave={hideTip}>
       {children}
-      <div className={`hovertip ${visible ? "visible" : ""}`}>{tip}</div>
+      {visible && <div className="hovertip">{tip}</div>}
     </div>
   )
 }
