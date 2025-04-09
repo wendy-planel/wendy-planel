@@ -410,7 +410,6 @@ function ButtonBox(props: ButtonBoxProps) {
     downloading: false,
     deploying: false
   })
-
   async function handleShare() {
     let text = ""
     text = text + `房间: ${deploy.cluster.ini.cluster_name}\n`
@@ -426,7 +425,14 @@ function ButtonBox(props: ButtonBoxProps) {
       ...states,
       deleting: true
     })
-    onDelete(deploy.id)
+    try {
+      onDelete(deploy.id)
+    } finally {
+      setStates({
+        ...states,
+        deleting: false
+      })
+    }
   }
   async function clickDownload() {
     setStates({
@@ -479,27 +485,30 @@ function ButtonBox(props: ButtonBoxProps) {
       ...states,
       deploying: true
     })
-    if (deploy.status === "running") {
-      await DeployAPI.stop(deploy.id)
-      setDeploy(
-        produce((draft) => {
-          draft.status = "stop"
-        })
-      )
-    } else {
-      const _deploy = await DeployAPI.update(deploy.id, deploy)
-      setDeploy(
-        produce((draft) => {
-          if (draft.id === _deploy.id) {
-            Object.assign(draft, _deploy)
-          }
-        })
-      )
+    try {
+      if (deploy.status === "running") {
+        await DeployAPI.stop(deploy.id)
+        setDeploy(
+          produce((draft) => {
+            draft.status = "stop"
+          })
+        )
+      } else {
+        const _deploy = await DeployAPI.update(deploy.id, deploy)
+        setDeploy(
+          produce((draft) => {
+            if (draft.id === _deploy.id) {
+              Object.assign(draft, _deploy)
+            }
+          })
+        )
+      }
+    } finally {
+      setStates({
+        ...states,
+        deploying: false
+      })
     }
-    setStates({
-      ...states,
-      deploying: false
-    })
   }
   return (
     <div className="buttons-box">
